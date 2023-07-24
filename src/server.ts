@@ -8,7 +8,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.post('/', (req, res) => {
-  res.json({ message: req.body });
+  //res.json({ message: req.body });
+  console.log(req.body);
 });
 
 export default app;
