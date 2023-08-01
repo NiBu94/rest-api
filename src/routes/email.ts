@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
   emailRouter.post('/send-email', (req, res) => {
 
   const mailOptions = {
-    from: 'info@vandermerve.ch',
+    from: 'test@vandermerwe.ch',
     to: 'bulokhov.nikita@gmail.com',
     subject: 'Test',
     text: 'Test Text'
