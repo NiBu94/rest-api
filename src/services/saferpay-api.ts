@@ -1,7 +1,4 @@
 import axios from 'axios';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const user = process.env.SAFERPAY_USER;
 const password = process.env.SAFERPAY_PASSWORD;
