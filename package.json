@@ -1,5 +1,5 @@
 {
-  "name": "test",
+  "name": "rest-api",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -16,9 +16,9 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/NiBu94/test/issues"
+    "url": "https://github.com/NiBu94/rest-api/issues"
   },
-  "homepage": "https://github.com/NiBu94/test#readme",
+  "homepage": "https://github.com/NiBu94/rest-api#readme",
   "dependencies": {
     "@types/node": "^20.4.4",
     "axios": "^1.4.0",
