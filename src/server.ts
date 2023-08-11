@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morganLogger);
 
 app.get('/', (req, res, next) => {
-  res.status(200);
+  res.status(200).json({ message: 'hello' });
 });
 
 app.use((err, req, res, next) => {
