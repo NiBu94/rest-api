@@ -10,6 +10,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(morganLogger);
 
+app.get('/', (req, res, next) => {
+  res.status(200);
+});
+
 app.use((err, req, res, next) => {
   winstonLogger.error(err.stack);
   res.status(500).json({ message: 'Something broke!' });

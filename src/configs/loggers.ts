@@ -12,7 +12,7 @@ if (config.env === 'production' && !fs.existsSync(logDir)) {
 
 let transports = [];
 
-if (config.env === 'development') {
+if (config.env !== 'production') {
   transports.push(
     new winston.transports.Console({
       format: winston.format.simple(),
@@ -47,7 +47,7 @@ const logFormat =
 
 let morganStream;
 
-if (config.env === 'development') {
+if (config.env !== 'production') {
   morganStream = process.stdout;
 } else {
   morganStream = fs.createWriteStream(path.join(logDir, 'request.log'), {
