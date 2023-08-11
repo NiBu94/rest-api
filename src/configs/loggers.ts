@@ -6,13 +6,13 @@ import config from './config';
 
 const logDir = path.join(__dirname, '..', '..', 'logs');
 
-if (config.env === 'production' && !fs.existsSync(logDir)) {
+if (config.env !== 'local' && !fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
 
 let transports = [];
 
-if (config.env !== 'production') {
+if (config.env === 'local') {
   transports.push(
     new winston.transports.Console({
       format: winston.format.simple(),
@@ -47,7 +47,7 @@ const logFormat =
 
 let morganStream;
 
-if (config.env !== 'production') {
+if (config.env === 'local') {
   morganStream = process.stdout;
 } else {
   morganStream = fs.createWriteStream(path.join(logDir, 'request.log'), {
