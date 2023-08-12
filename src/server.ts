@@ -1,6 +1,6 @@
 import express from 'express';
 import { winstonLogger, morganLogger } from './configs/loggers';
-import kidsCamp from './routes/payment-kids-camp';
+import paymentKidsCampt from './routes/payment-kids-camp';
 import emailRouter from './routes/email';
 
 const app = express();
@@ -10,15 +10,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(morganLogger);
 
-app.get('/', (req, res, next) => {
-  res.status(200).json({ message: 'hello' });
-});
+app.use('/api', paymentKidsCampt, emailRouter);
 
 app.use((err, req, res, next) => {
-  winstonLogger.error(err.stack);
+  winstonLogger.error(err.message);
   res.status(500).json({ message: 'Something broke!' });
 });
-
-app.use('/api', kidsCamp, emailRouter);
 
 export default app;
