@@ -1,31 +1,11 @@
 import axios from 'axios';
+import config from '../configs/config';
 
-const user = process.env.SAFERPAY_USER;
-const password = process.env.SAFERPAY_PASSWORD;
+const user = config.secrets.saferpayUser;
+const password = config.secrets.saferpayPassword;
 const authString = Buffer.from(`${user}:${password}`).toString('base64');
 
-const data = {
-  RequestHeader: {
-    SpecVersion: "1.35",
-    CustomerId: "269924",
-    RequestId: "1F",
-    RetryIndicator: 0
-  },
-  TerminalId: "17759815",
-  Payment: {
-    Amount: {
-      Value: "100",
-      CurrencyCode: "CHF"
-    },
-    OrderId: "1",
-    Description: "Description of payment"
-  },
-  ReturnUrl: {
-    Url: "https://neu.vandermerwe.ch/wp/"
-  }
-};
-
-const options = {
+const header = {
   headers: {
     'Content-Type': 'application/json; charset=utf-8',
     'Accept': 'application/json',
@@ -33,11 +13,28 @@ const options = {
   }
 };
 
-export const sendSaferpayRequest = async () => {
-  try {
-    const response = await axios.post('https://test.saferpay.com/api/Payment/v1/PaymentPage/Initialize', data, options);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+export const sendSaferpayRequest = async (price) => {
+  const data = {
+    RequestHeader: {
+      SpecVersion: "1.35",
+      CustomerId: "269924",
+      RequestId: "1F",
+      RetryIndicator: 0
+    },
+    TerminalId: "17759815",
+    Payment: {
+      Amount: {
+        Value: price,
+        CurrencyCode: 'CHF'
+      },
+      OrderId: '1',
+      Description: 'OrderDescription'
+    },
+    ReturnUrl: {
+      Url: "https://neu.vandermerwe.ch/wp/"
+    }
+  };
+
+  const response = await axios.post('https://test.saferpay.com/api/Payment/v1/PaymentPage/Initialize', data, header);
+  return response.data;
 };
