@@ -14,7 +14,6 @@ const header = {
 };
 
 export const sendSaferpayRequest = async (price) => {
-  throw new Error('testError');
   const data = {
     RequestHeader: {
       SpecVersion: '1.35',
