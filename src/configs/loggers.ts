@@ -33,7 +33,7 @@ if (config.env === 'local') {
 export const winstonLogger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
-  defaultMeta: { service: 'user-service' },
+  //defaultMeta: { service: 'user-service' },
   transports: transports,
 });
 

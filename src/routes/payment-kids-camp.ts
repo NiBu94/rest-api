@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { sendSaferpayRequest } from '../services/saferpay-api';
 
-const paymentKidsCampt = Router();
+const paymentKidsCamp = Router();
 
-paymentKidsCampt.post('/saferpay', async (req, res, next) => {
+paymentKidsCamp.post('/saferpay', async (req, res, next) => {
   try {
     // Example Price: 100 CHF => 1.00 CHF
     const price = req.body.fields.totalPrice.value * 100;
@@ -14,4 +14,4 @@ paymentKidsCampt.post('/saferpay', async (req, res, next) => {
   }
 });
 
-export default paymentKidsCampt;
+export default paymentKidsCamp;

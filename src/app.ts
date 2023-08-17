@@ -2,10 +2,11 @@ import * as dotenv from 'dotenv'
 dotenv.config();
 import app from './server'
 import config from './configs/config';
+import { winstonLogger } from './configs/loggers';
 
 
 
 app.listen(config.port, () => {
-  console.log(`running on http://localhost:${config.port}`)
-  console.log(`environment: ${config.env}`)
+  winstonLogger.info(`running on http://localhost:${config.port}`)
+  winstonLogger.info(`environment: ${config.env}`)
 })
