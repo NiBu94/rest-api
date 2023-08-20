@@ -1,10 +1,5 @@
 export const customerEmail = async (firstNameCustomer, lastNameCustomer, firstNameChild, lastNameChild) => {
-
-}
-
-
-
-Mail Teilnehmer
+`Mail Teilnehmer
 
 Betreff: Van der Merwe Center - Anmeldung Kindercamp
 
@@ -20,4 +15,5 @@ Treffpunkt ist täglich um 10:00 Uhr im Eingangsbereich des Van der Merwe Center
 Die Camp-Teilnehmer sollten Sportkleidung und Sportschuhe anziehen und eine Trinkflasche mitnehmen. An kühlen Tagen empfehlen wir zusätzlich zur Sportkleidung auch einen Pullover/Trainingsjacke mitzubringen. Im Sommer sollten die Kinder einen Hut mitbringen und sich zu Hause eincremen.
 
 Wir freuen uns auf das Camp!
-Ihr Multisport-Camp Team
+Ihr Multisport-Camp Team`
+}
