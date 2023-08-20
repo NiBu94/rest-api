@@ -30,10 +30,22 @@ if (config.env === 'local') {
   );
 }
 
+const formatDate = () => {
+  const d = new Date();
+  const pad = (num) => num < 10 ? '0' + num : num;
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+};
+
+const customFormat = winston.format.printf(({ timestamp, level, message, ...metadata }) => {
+  return `${formatDate()} [${level}]: ${message} ${Object.keys(metadata).length ? JSON.stringify(metadata) : ''}`;
+});
+
 export const winstonLogger = winston.createLogger({
   level: 'info',
-  format: winston.format.json(),
-  //defaultMeta: { service: 'user-service' },
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    customFormat
+  ),
   transports: transports,
 });
 

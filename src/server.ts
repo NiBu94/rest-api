@@ -16,7 +16,7 @@ app.use('/api', paymentKidsCamp, emailRouter);
 
 app.use((err, req, res, next) => {
   winstonLogger.error(err.message);
-  res.status(500).json({ message: 'Something broke!' });
+  res.status(500).json({ message: err.message });
 });
 
 export default app;

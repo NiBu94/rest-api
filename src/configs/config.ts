@@ -1,6 +1,7 @@
 import merge from 'lodash.merge';
 
 const env = process.env.NODE_ENV || 'local';
+const port = process.env.PORT || '5000';
 
 let envConfig = {};
 
@@ -13,7 +14,7 @@ if (env === 'production') {
 export default merge(
   {
     env,
-    port: process.env.PORT,
+    port: port,
     secrets: {
       saferpayUser: process.env.SAFERPAY_USER,
       saferpayPassword: process.env.SAFERPAY_PASSWORD,
