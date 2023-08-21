@@ -16,8 +16,7 @@ export default merge(
     env,
     port: port,
     secrets: {
-      saferpayUser: process.env.SAFERPAY_USER,
-      saferpayPassword: process.env.SAFERPAY_PASSWORD,
+      saferpayAuth: process.env.SAFERPAY_AUTH,
       smtpHost: process.env.SMTP_HOST,
       smtpPort: process.env.SMTP_PORT,
       smtpUser: process.env.SMTP_USER,
