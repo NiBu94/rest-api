@@ -1,5 +1,6 @@
 import axios from 'axios';
 import config from '../configs/config';
+import { winstonLogger } from '../configs/loggers';
 
 const user = config.secrets.saferpayUser;
 const password = config.secrets.saferpayPassword;
@@ -34,7 +35,10 @@ export const sendSaferpayRequest = async (price) => {
       Url: 'https://neu.vandermerwe.ch/wp/',
     },
   };
-
+  winstonLogger.info(`user: ${user}`);
+  winstonLogger.info(`pw: ${password}`);
+  winstonLogger.info(`header: ${JSON.stringify(header)}`);
+  winstonLogger.info(`data: ${JSON.stringify(data)}`);
   const response = await axios.post(
     'https://test.saferpay.com/api/Payment/v1/PaymentPage/Initialize',
     data,
