@@ -8,7 +8,7 @@ paymentKidsCamp.post('/saferpay', async (req, res, next) => {
     // Example Price: 100 CHF => 1.00 CHF
     const price = req.body.fields.totalPrice.value * 100;
     const data = await sendSaferpayRequest(price);
-    res.json({ RedirectURL: data.RedirectUrl });
+    res.json({ redirectURL: data.RedirectUrl });
   } catch (e) {
     next(e);
   }
