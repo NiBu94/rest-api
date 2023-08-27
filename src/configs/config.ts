@@ -14,7 +14,7 @@ if (env === 'production') {
 export default merge(
   {
     env,
-    port: port,
+    port,
     secrets: {
       saferpayAuth: process.env.SAFERPAY_AUTH,
       smtpHost: process.env.SMTP_HOST,
