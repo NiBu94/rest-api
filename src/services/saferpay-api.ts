@@ -28,9 +28,8 @@ export const sendSaferpayRequest = async (price) => {
       OrderId: '1',
       Description: 'OrderDescription',
     },
-    ReturnUrls: {
-      Succes: 'https://neu.vandermerwe.ch/wp/bezahlung-erfolgreich/',
-      Fail: 'https://neu.vandermerwe.ch/wp/bezahlung-fehlgeschlagen/',
+    ReturnUrl: {
+      Url: 'https://neu.vandermerwe.ch/wp/bezahlung-erfolgreich/',
     },
   };
   const response = await axios.post('https://test.saferpay.com/api/Payment/v1/PaymentPage/Initialize', data, header);

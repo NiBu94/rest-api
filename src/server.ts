@@ -10,11 +10,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morganLogger);
 
-
 app.use('/api', paymentKidsCamp);
 
 app.use((err, req, res, next) => {
   winstonLogger.error(err.message);
+  winstonLogger.error(JSON.stringify(err.response.data));
   res.status(500).json({ message: err.message });
 });
 
