@@ -1,0 +1,9 @@
+4 von 4 = 240, 4 von 5 = 290, 
+CHF vor Zahl. Wenn auf Weiter, dann wieder oben. 
+Geschlecht männlich weiblich. 
+Darf alleine nach hause ja nein pflicht. 
+Allergien (optional). 
+Feldtyp email. 
+Alles links anordnen. 
+Preis 2x bei Geschwister
+Rabatt erst bei voller Woche

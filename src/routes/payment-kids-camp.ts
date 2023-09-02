@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { sendSaferpayRequest } from '../services/saferpay-api';
+import { sendSaferpayRequest, pollPaymentStatus } from '../services/saferpay-api';
 
 const paymentKidsCamp = Router();
 
@@ -22,6 +22,7 @@ paymentKidsCamp.post('/payment-kids-camp', async (req, res, next) => {
     }
     // Example Price: 100 CHF => 1.00 CHF
     const data = await sendSaferpayRequest(price * 100);
+    pollPaymentStatus(data.Token);
     res.json({ redirectURL: data.RedirectUrl });
   } catch (e) {
     next(e);
