@@ -2,8 +2,11 @@ import winston from 'winston';
 import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
-import config from './config';
+import config from './config.js';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const logDir = path.join(__dirname, '..', '..', 'logs');
 
 if (config.env !== 'local' && !fs.existsSync(logDir)) {
@@ -32,8 +35,10 @@ if (config.env === 'local') {
 
 const formatDate = () => {
   const d = new Date();
-  const pad = (num) => num < 10 ? '0' + num : num;
-  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+  const pad = (num) => (num < 10 ? '0' + num : num);
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(
+    d.getUTCSeconds()
+  )}`;
 };
 
 const customFormat = winston.format.printf(({ timestamp, level, message, ...metadata }) => {
@@ -42,10 +47,7 @@ const customFormat = winston.format.printf(({ timestamp, level, message, ...meta
 
 export const winstonLogger = winston.createLogger({
   level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    customFormat
-  ),
+  format: winston.format.combine(winston.format.timestamp(), customFormat),
   transports: transports,
 });
 
@@ -54,8 +56,7 @@ morgan.token('body', function (req, res) {
   return JSON.stringify(req.body);
 });
 
-const logFormat =
-  ':method :url :status :response-time ms - :res[content-length] - Body:\n :body';
+const logFormat = ':method :url :status :response-time ms - :res[content-length] - Body:\n :body';
 
 let morganStream;
 

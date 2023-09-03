@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "test": "jest",
-    "dev": "ts-node src/app.ts",
-    "build": "tsc -p tsconfig.json",
-    "start": "node dist/app.js"
+    "start": "node src/app.js"
   },
   "repository": {
     "type": "git",
@@ -20,7 +19,6 @@
   },
   "homepage": "https://github.com/NiBu94/rest-api#readme",
   "dependencies": {
-    "@types/node": "^20.4.4",
     "axios": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -30,8 +28,6 @@
     "morgan": "^1.10.0",
     "nodemailer": "^6.9.4",
     "pug": "^3.0.2",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.6",
     "winston": "^3.10.0"
   }
 }

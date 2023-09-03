@@ -1,7 +1,10 @@
 import axios from 'axios';
-import config from '../configs/config';
+import crypto from 'crypto';
+import config from '../configs/config.js';
+import { winstonLogger } from '../configs/loggers.js';
 
 const auth = config.secrets.saferpayAuth;
+winstonLogger.info(JSON.stringify(config));
 
 const header = {
   headers: {
@@ -11,7 +14,21 @@ const header = {
   },
 };
 
+export const cache = {};
+
+export function setCacheWithExpiration(key, value) {
+  const expirationInMs = 60 * 60 * 500; // 30 minutes
+  cache[key] = value;
+
+  // Remove the entry after the expiration time
+  setTimeout(() => {
+    delete cache[key];
+  }, expirationInMs);
+}
+
 export const sendSaferpayRequest = async (price) => {
+  const customToken = crypto.randomBytes(16).toString('hex');
+  const modifiedReturnUrl = `https://neu.vandermerwe.ch/wp/bezahlung-verarbeitet/?token=${customToken}`;
   const data = {
     RequestHeader: {
       SpecVersion: '1.35',
@@ -29,10 +46,11 @@ export const sendSaferpayRequest = async (price) => {
       Description: 'OrderDescription',
     },
     ReturnUrl: {
-      Url: 'https://neu.vandermerwe.ch/wp/bezahlung-erfolgreich/',
+      Url: modifiedReturnUrl,
     },
   };
   const response = await axios.post('https://test.saferpay.com/api/Payment/v1/PaymentPage/Initialize', data, header);
+  setCacheWithExpiration(customToken, response.data.Token); // Expires in 1 hour
   return response.data;
 };
 

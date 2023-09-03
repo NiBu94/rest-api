@@ -1,14 +1,19 @@
+import * as dotenv from 'dotenv';
+dotenv.config()
 import merge from 'lodash.merge';
+import prodConfig from './prod.js';
+import devConfig from './dev.js';
 
+console.log(process.env.SAFERPAY_AUTH);
 const env = process.env.NODE_ENV || 'local';
 const port = process.env.PORT || '5000';
 
-let envConfig = {};
+let envConfig;
 
 if (env === 'production') {
-  envConfig = require('./prod').default;
+  envConfig = prodConfig;
 } else {
-  envConfig = require('./dev').default;
+  envConfig = devConfig;
 }
 
 export default merge(

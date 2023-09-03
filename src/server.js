@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import { winstonLogger, morganLogger } from './configs/loggers';
-import paymentKidsCamp from './routes/payment-kids-camp';
+import { winstonLogger, morganLogger } from './configs/loggers.js';
+import paymentKidsCamp from './routes/payment-kids-camp.js';
 
 const app = express();
 
@@ -10,11 +10,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morganLogger);
 
+
 app.use('/api', paymentKidsCamp);
 
 app.use((err, req, res, next) => {
   winstonLogger.error(err.message);
-  winstonLogger.error(JSON.stringify(err.response.data));
   res.status(500).json({ message: err.message });
 });
 
