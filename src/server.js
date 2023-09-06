@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { winstonLogger, morganLogger } from './configs/loggers.js';
 import paymentKidsCamp from './routes/payment-kids-camp.js';
+import paymentStatus from './routes/status-payment-kids-camp.js';
 
 const app = express();
 
@@ -11,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morganLogger);
 
 
-app.use('/api', paymentKidsCamp);
+app.use('/api', paymentKidsCamp, paymentStatus);
 
 app.use((err, req, res, next) => {
   winstonLogger.error(err.message);

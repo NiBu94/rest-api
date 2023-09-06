@@ -1,10 +1,9 @@
 import axios from 'axios';
 import crypto from 'crypto';
 import config from '../configs/config.js';
-import { winstonLogger } from '../configs/loggers.js';
+import { getPaymentToken, insertTokens } from '../db/db.js';
 
 const auth = config.secrets.saferpayAuth;
-winstonLogger.info(JSON.stringify(config));
 
 const header = {
   headers: {
@@ -16,13 +15,13 @@ const header = {
 
 export const cache = {};
 
-export function setCacheWithExpiration(key, value) {
+export function setCacheWithExpiration(customToken, paymentToken) {
   const expirationInMs = 60 * 60 * 500; // 30 minutes
-  cache[key] = value;
+  cache[customToken] = paymentToken;
 
   // Remove the entry after the expiration time
   setTimeout(() => {
-    delete cache[key];
+    delete cache[customToken];
   }, expirationInMs);
 }
 
@@ -50,66 +49,59 @@ export const sendSaferpayRequest = async (price) => {
     },
   };
   const response = await axios.post('https://test.saferpay.com/api/Payment/v1/PaymentPage/Initialize', data, header);
-  setCacheWithExpiration(customToken, response.data.Token); // Expires in 1 hour
+  setCacheWithExpiration(customToken, response.data.Token);
+  insertTokens(customToken, response.data.Token);
   return response.data;
 };
 
-export const pollPaymentStatus = (token) => {
-  let intervalId;
-  const poll = async () => {
-    try {
-      const response = await axios.post(
-        'https://test.saferpay.com/api/Payment/v1/PaymentPage/Assert',
-        {
-          RequestHeader: {
-            SpecVersion: '1.35',
-            CustomerId: '269924',
-            RequestId: '1F',
-            RetryIndicator: 0,
-          },
-          Token: token,
+export const checkPaymentStatus = async (customToken, operation) => {
+  try {
+    console.time('retrieveFrom');
+    const saferpayToken = operation === 'cache' ? cache[customToken] : getPaymentToken(customToken);
+    console.timeEnd('retrieveFrom');
+    // if (!saferpayToken) {
+    // return res.status(400).json({ message: 'Invalid or expired token' });
+    // }
+    const response = await axios.post(
+      'https://test.saferpay.com/api/Payment/v1/PaymentPage/Assert',
+      {
+        RequestHeader: {
+          SpecVersion: '1.35',
+          CustomerId: '269924',
+          RequestId: '1F',
+          RetryIndicator: 0,
         },
-        header
-      );
+        Token: saferpayToken,
+      },
+      header
+    );
 
-      const { Status } = response.data.Transaction;
+    const { Status } = response.data.Transaction;
 
-      switch (Status) {
-        case 'AUTHORIZED':
-          console.log('Payment successful, sending emails...');
-          clearInterval(intervalId); // Stop polling
-          break;
-        case 'CANCELED':
-          console.log('Payment was canceled, stopping polling.');
-          clearInterval(intervalId); // Stop polling
-          break;
-        case 'PENDING':
-          console.log('Payment is pending, continue polling.');
-          break;
-        default:
-          console.log(`Unknown status ${Status}, stopping polling.`);
-          clearInterval(intervalId); // Stop polling
-          break;
-      }
-    } catch (err) {
-      if (err.response && err.response.status === 402) {
-        const errorMessage = err.response.data;
-        console.log('API Error Message:', errorMessage);
-        console.log(err.response.status);
-        console.error('Polling too early, will try again.');
-        // Continue polling, do not clear the interval
-      } else {
-        console.error('An unexpected error occurred while polling:', err);
-        clearInterval(intervalId); // Stop polling in case of an unexpected error
-      }
+    switch (Status) {
+      case 'AUTHORIZED':
+        console.log('Payment successful, sending emails...');
+        break;
+      case 'CANCELED':
+        console.log('Payment was canceled, stopping polling.');
+        break;
+      case 'PENDING':
+        console.log('Payment is pending, continue polling.');
+        break;
+      default:
+        console.log(`Unknown status ${Status}, stopping polling.`);
+        break;
     }
-  };
-
-  // First poll after 5 minutes
-  setTimeout(() => {
-    poll();
-
-    // Subsequent polls every 1 minute
-    intervalId = setInterval(poll, 10000); // Assign the interval ID here
-  }, 10000); // 5 minutes in milliseconds
+    return Status;
+  } catch (err) {
+    if (err.response && err.response.status === 402) {
+      const errorMessage = err.response.data;
+      console.log('API Error Message:', errorMessage);
+      console.log(err.response.status);
+      console.error('Polling too early, will try again.');
+      // Continue polling, do not clear the interval
+    } else {
+      console.error('An unexpected error occurred while polling:', err);
+    }
+  }
 };
