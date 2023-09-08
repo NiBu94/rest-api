@@ -2,6 +2,7 @@ import axios from 'axios';
 import crypto from 'crypto';
 import config from '../configs/config.js';
 import { getPaymentToken, insertTokens } from '../db/db.js';
+import { winstonLogger } from '../configs/loggers.js';
 
 const auth = config.secrets.saferpayAuth;
 
@@ -11,6 +12,13 @@ const header = {
     Accept: 'application/json',
     Authorization: `Basic ${auth}`,
   },
+};
+
+const saferpayHeader = {
+  SpecVersion: '1.35',
+  CustomerId: '269924',
+  RequestId: '1F',
+  RetryIndicator: 0,
 };
 
 export const cache = {};
@@ -25,58 +33,53 @@ export function setCacheWithExpiration(customToken, paymentToken) {
   }, expirationInMs);
 }
 
-export const sendSaferpayRequest = async (price) => {
-  const customToken = crypto.randomBytes(16).toString('hex');
-  const modifiedReturnUrl = `https://neu.vandermerwe.ch/wp/bezahlung-verarbeitet/?token=${customToken}`;
-  const data = {
-    RequestHeader: {
-      SpecVersion: '1.35',
-      CustomerId: '269924',
-      RequestId: '1F',
-      RetryIndicator: 0,
-    },
-    TerminalId: '17759815',
-    Payment: {
-      Amount: {
-        Value: price,
-        CurrencyCode: 'CHF',
+export const initializePayment = async (price) => {
+  try {
+    const customToken = crypto.randomBytes(16).toString('hex');
+    const data = {
+      RequestHeader: saferpayHeader,
+      TerminalId: '17759815',
+      Payment: {
+        Amount: {
+          Value: price,
+          CurrencyCode: 'CHF',
+        },
+        OrderId: '1',
+        Description: 'OrderDescription',
       },
-      OrderId: '1',
-      Description: 'OrderDescription',
-    },
-    ReturnUrl: {
-      Url: modifiedReturnUrl,
-    },
-  };
-  const response = await axios.post('https://test.saferpay.com/api/Payment/v1/PaymentPage/Initialize', data, header);
-  setCacheWithExpiration(customToken, response.data.Token);
-  insertTokens(customToken, response.data.Token);
-  return response.data;
+      ReturnUrl: {
+        Url: `https://neu.vandermerwe.ch/wp/bezahlung-verarbeitet/?token=${customToken}`,
+      },
+      Notification: {
+        MerchantEmails: ['contact@nbweb.solutions'],
+        PayerEmail: 'contact@nbweb.solutions',
+        SuccessNotifyUrl: `https://neu.vandermerwe.ch/api/payment-notification-success/?token=${customToken}`,
+        FailNotifyUrl: `https://neu.vandermerwe.ch/api/payment-notification-failure/?token=${customToken}`,
+      },
+    };
+    const res = await axios.post('https://test.saferpay.com/api/Payment/v1/PaymentPage/Initialize', data, header);
+    setCacheWithExpiration(customToken, res.data.Token);
+    insertTokens(customToken, res.data.Token);
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
 };
 
-export const checkPaymentStatus = async (customToken, operation) => {
+export const checkPaymentStatus = async (customToken) => {
   try {
-    console.time('retrieveFrom');
-    const saferpayToken = operation === 'cache' ? cache[customToken] : getPaymentToken(customToken);
-    console.timeEnd('retrieveFrom');
-    // if (!saferpayToken) {
-    // return res.status(400).json({ message: 'Invalid or expired token' });
-    // }
-    const response = await axios.post(
+    const saferpayToken = cache[customToken] ? cache[customToken] : await getPaymentToken(customToken);
+    const res = await axios.post(
       'https://test.saferpay.com/api/Payment/v1/PaymentPage/Assert',
       {
-        RequestHeader: {
-          SpecVersion: '1.35',
-          CustomerId: '269924',
-          RequestId: '1F',
-          RetryIndicator: 0,
-        },
+        RequestHeader: saferpayHeader,
         Token: saferpayToken,
       },
       header
     );
 
-    const { Status } = response.data.Transaction;
+    const { Status } = res.data.Transaction;
+    winstonLogger.info(JSON.stringify(res.data));
 
     switch (Status) {
       case 'AUTHORIZED':
@@ -88,20 +91,22 @@ export const checkPaymentStatus = async (customToken, operation) => {
       case 'PENDING':
         console.log('Payment is pending, continue polling.');
         break;
-      default:
-        console.log(`Unknown status ${Status}, stopping polling.`);
-        break;
     }
     return Status;
   } catch (err) {
-    if (err.response && err.response.status === 402) {
-      const errorMessage = err.response.data;
-      console.log('API Error Message:', errorMessage);
-      console.log(err.response.status);
-      console.error('Polling too early, will try again.');
-      // Continue polling, do not clear the interval
-    } else {
-      console.error('An unexpected error occurred while polling:', err);
-    }
+    throw err;
   }
+};
+
+export const captureOrCancelPayment = async (action) => {
+  const res = await axios.post(
+    `https://test.saferpay.com/api/Payment/v1/Transaction/${action}`,
+    {
+      RequestHeader: saferpayHeader,
+      TransactionReference: {
+        TransactionId: '',
+      },
+    },
+    header
+  );
 };

@@ -19,12 +19,11 @@ export const insertTokens = async (customToken, paymentToken) => {
   let db;
   try {
     db = await connect();
-    const [result] = await db.execute('INSERT INTO `payments` (custom_token, payment_token, timestamp) VALUES (?, ?, ?)', [
+    await db.execute('INSERT INTO `payments` (custom_token, payment_token, timestamp) VALUES (?, ?, ?)', [
       customToken,
       paymentToken,
       new Date(),
     ]);
-    console.log(result);
   } catch (error) {
     console.error(error);
   } finally {
@@ -42,6 +41,7 @@ export const getPaymentToken = async (customToken) => {
 
     if (rows.length > 0) {
       console.log('Payment Token:', rows[0].payment_token);
+      return rows[0].payment_token;
     } else {
       console.log('No record found');
     }

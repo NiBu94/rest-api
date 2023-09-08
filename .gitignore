@@ -3,3 +3,4 @@ dist
 frontend.js
 .env
 /logs/
+frontend
