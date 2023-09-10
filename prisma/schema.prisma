@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id                String    @id @default(uuid())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  firstName         String
+  lastName          String
+  street            String
+  streetNumber      String
+  zipCode           String
+  city              String
+  email             String
+  firstPhoneNumber  String
+  secondPhoneNumber String?
+  optionalMessage   String?
+  agreementAGB      Boolean
+  children          Child[]
+  bookings          Booking[]
+  payments          Payment[]
+}
+
+model Child {
+  id                     String    @id @default(uuid())
+  customerId             String
+  firstName              String
+  lastName               String
+  birthday               DateTime
+  gender                 String
+  allowanceToGoHomeAlone Boolean
+  allergies              String?
+  customer               Customer @relation(fields: [customerId], references: [id])
+}
+
+model Booking {
+  id          String    @id @default(uuid())
+  customerId  String
+  createdAt   DateTime     @default(now())
+  bookedWeeks BookedWeek[]
+  customer    Customer     @relation(fields: [customerId], references: [id])
+}
+
+model BookedWeek {
+  id         String    @id @default(uuid())
+  bookingId  String
+  weekName   String
+  maxDays    Int
+  bookedDays BookedDays[]
+  booking    Booking      @relation(fields: [bookingId], references: [id])
+}
+
+model BookedDays {
+  id           String    @id @default(uuid())
+  bookedWeekId String
+  bookedDay    String
+  bookedWeek   BookedWeek @relation(fields: [bookedWeekId], references: [id])
+}
+
+model Tokens {
+  id           String    @id @default(uuid())
+  customToken  String    @unique
+  paymentToken String    @unique
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+  paymentId    String      @unique
+  Payment      Payment? @relation(fields: [paymentId], references: [id])
+}
+
+enum TransactionStatus {
+  AUTHORIZED
+  CAPTURED
+  CANCELED
+}
+
+model Payment {
+  id                      String    @id @default(uuid())
+  customerId              String
+  amount                  Float
+  currency                String             @default("CHF")
+  orderId                 String
+  transactionStatus       TransactionStatus?
+  transactionType         String?
+  transactionId           String?
+  transactionDate         DateTime?
+  acquirerName            String?
+  acquirerReference       String?
+  sixTransactionReference String?
+  approvalCode            String?
+  liabilityShift          Boolean?
+  liableEntity            String?
+  captureId               String?
+  captureDate             DateTime?
+  tokens                  Tokens?
+  customer                Customer           @relation(fields: [customerId], references: [id])
+}

@@ -3,15 +3,15 @@
   "Transaction": {
     "Type": "PAYMENT",
     "Status": "AUTHORIZED",
-    "Id": "8YAY4IAWn174rAQ5rjl9A6rlW6fb",
-    "Date": "2023-09-08T15:25:44.606+02:00",
+    "Id": "2IEApIbWOE02tA787tttbxz4QSKb",
+    "Date": "2023-09-08T19:12:26.614+02:00",
     "Amount": { "Value": "69000", "CurrencyCode": "CHF" },
     "OrderId": "1",
     "AcquirerName": "VISA Saferpay Test",
-    "AcquirerReference": "41947945839",
-    "SixTransactionReference": "0:0:3:8YAY4IAWn174rAQ5rjl9A6rlW6fb",
-    "ApprovalCode": "318244",
-    "IssuerReference": { "TransactionStamp": "5079361654345109050788" }
+    "AcquirerReference": "49638323337",
+    "SixTransactionReference": "0:0:3:2IEApIbWOE02tA787tttbxz4QSKb",
+    "ApprovalCode": "776696",
+    "IssuerReference": { "TransactionStamp": "1662284634811869918793" }
   },
   "PaymentMeans": {
     "Brand": { "PaymentMethod": "VISA", "Name": "VISA" },
@@ -24,7 +24,7 @@
     "LiableEntity": "THREEDS",
     "ThreeDs": {
       "Authenticated": true,
-      "Xid": "bc0a4f32-d7c1-4818-bdba-a5d79106158d",
+      "Xid": "79eea90e-1209-438b-8c25-6fb59381e425",
       "Version": "2",
       "AuthenticationType": "STRONG_CUSTOMER_AUTHENTICATION"
     },

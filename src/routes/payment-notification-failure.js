@@ -6,7 +6,7 @@ const paymentNotificationFailure = Router();
 paymentNotificationFailure.get('/payment-notification-failure', async (req, res, next) => {
   const customToken = req.query.token;
   winstonLogger.info(`payment failed!: ${customToken}`);
-  res.status(200);
+  res.status(200).end();
 });
 
 export default paymentNotificationFailure;

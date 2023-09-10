@@ -1,0 +1,23 @@
+{
+  "bookedWeeks": [
+    { "autumnFirstWeek": { "bookedDays": ["Mo", "Di"], "maxDays": 5 } },
+    { "autumnSecondWeek": { "bookedDays": ["Mo", "Di", "Mi", "Do", "Fr"], "maxDays": 5 } },
+    { "christmasFirstWeek": { "bookedDays": ["Mo", "Do", "Fr"], "maxDays": 3 } },
+    { "christmasSecondWeek": { "bookedDays": ["Di", "Mi", "Do", "Fr"], "maxDays": 4 } }
+  ],
+  "firstChild": { "firstName": "", "lastName": "", "birthday": "", "gender": "Männlich", "allowanceToGoHomeAlone": "Ja", "allergies": "" },
+  "secondChild": { "firstName": "", "lastName": "", "birthday": "", "gender": "Männlich", "allowanceToGoHomeAlone": "Ja", "allergies": "" },
+  "contactPerson": {
+    "firstName": "",
+    "lastName": "",
+    "street": "",
+    "streetNumber": "",
+    "zipCode": "",
+    "city": "",
+    "email": "",
+    "firstPhoneNumber": "",
+    "secondPhoneNumber": "",
+    "optionalMessage": "",
+    "agreementAGB": "on"
+  }
+}

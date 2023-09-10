@@ -25,10 +25,6 @@ export default merge(
       smtpPort: process.env.SMTP_PORT,
       smtpUser: process.env.SMTP_USER,
       smtpPassword: process.env.SMTP_PASS,
-      dbHost: process.env.DB_HOST,
-      dbUser: process.env.DB_USER,
-      dbPassword: process.env.DB_PASS,
-      dbName: process.env.DB_NAME,
     },
     logging: {
       console: true,
