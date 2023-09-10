@@ -1,8 +1,6 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 import merge from 'lodash.merge';
-import prodConfig from './prod.js';
-import devConfig from './dev.js';
 
 const env = process.env.NODE_ENV || 'local';
 const port = process.env.PORT || '5000';
@@ -10,9 +8,9 @@ const port = process.env.PORT || '5000';
 let envConfig;
 
 if (env === 'production') {
-  envConfig = prodConfig;
+  envConfig = require('./prod').default;
 } else {
-  envConfig = devConfig;
+  envConfig = require('./dev').default;
 }
 
 export default merge(

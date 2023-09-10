@@ -1,8 +1,8 @@
 import axios from 'axios';
 import crypto from 'crypto';
-import config from '../configs/config.js';
-import prisma from '../configs/db.js';
-import { winstonLogger } from '../configs/loggers.js';
+import config from '../configs/config';
+import prisma from '../configs/db';
+import { winstonLogger } from '../configs/loggers';
 
 const auth = config.secrets.saferpayAuth;
 

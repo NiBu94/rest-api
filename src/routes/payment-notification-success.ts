@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { winstonLogger } from '../configs/loggers.js';
+import { winstonLogger } from '../configs/loggers';
 
 const paymentNotificationSuccess = Router();
 

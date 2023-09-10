@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { initializePayment } from '../services/saferpay-api.js';
+import { initializePayment } from '../services/saferpay-api';
 
 const paymentKidsCamp = Router();
 

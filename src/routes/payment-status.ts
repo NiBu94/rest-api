@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { checkPaymentStatus, captureOrCancelPayment } from '../services/saferpay-api.js';
-import { winstonLogger } from '../configs/loggers.js';
+import { checkPaymentStatus, captureOrCancelPayment } from '../services/saferpay-api';
+import { winstonLogger } from '../configs/loggers';
 
 const paymentStatus = Router();
 

@@ -1,7 +1,6 @@
-import config from './configs/config.js';
-import app from './server.js';
-import { winstonLogger } from './configs/loggers.js';
-
+import config from './configs/config';
+import app from './server';
+import { winstonLogger } from './configs/loggers';
 
 app.listen(config.port, () => {
   winstonLogger.info(`running on http://localhost:${config.port}`);

@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import { winstonLogger, morganLogger } from './configs/loggers.js';
-import paymentKidsCamp from './routes/payment-kids-camp.js';
-import paymentStatus from './routes/status-payment-kids-camp.js';
-import paymentNotificationSuccess from './routes/payment-notification-success.js';
-import paymentNotificationFailure from './routes/payment-notification-failure.js';
+import { winstonLogger, morganLogger } from './configs/loggers';
+import paymentKidsCamp from './routes/initialize-payment';
+import paymentStatus from './routes/payment-status';
+import paymentNotificationSuccess from './routes/payment-notification-success';
+import paymentNotificationFailure from './routes/payment-notification-failure';
 
 const app = express();
 
