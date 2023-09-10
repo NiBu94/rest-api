@@ -33,7 +33,7 @@ export function setCacheWithExpiration(customToken, paymentToken) {
   }, expirationInMs);
 }
 
-export const initializePayment = async (price) => {
+export const createPayment = async (price) => {
   try {
     const customToken = crypto.randomBytes(16).toString('hex');
     const data = {

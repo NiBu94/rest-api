@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { initializePayment } from '../services/saferpay-api';
+import { createPayment } from '../services/saferpay-api';
 
-const paymentKidsCamp = Router();
+const initializePayment = Router();
 
-paymentKidsCamp.post('/initialize-payment', async (req, res, next) => {
+initializePayment.post('/initialize-payment', async (req, res, next) => {
   try {
     const priceMap = {
       5: { 1: 75, 2: 150, 3: 225, 4: 290, 5: 290 },
@@ -24,7 +24,7 @@ paymentKidsCamp.post('/initialize-payment', async (req, res, next) => {
 
         price += priceObj[days];
 
-        if (days === maxDays && !priceReduced) {
+        if (days === maxDays && req.body.secondChild.firstName !== '' && !priceReduced) {
           price -= 20;
           priceReduced = true;
         }
@@ -32,11 +32,11 @@ paymentKidsCamp.post('/initialize-payment', async (req, res, next) => {
     }
 
     // Example Price: 100 CHF => 1.00 CHF
-    const data = await initializePayment(price * 100);
+    const data = await createPayment(price * 100);
     res.json({ redirectURL: data.RedirectUrl });
   } catch (err) {
     next(err);
   }
 });
 
-export default paymentKidsCamp;
+export default initializePayment;
