@@ -50,12 +50,14 @@ export const initializePayment = async (price) => {
       ReturnUrl: {
         Url: `https://neu.vandermerwe.ch/wp/bezahlung-verarbeitet/?token=${customToken}`,
       },
+      /*
       Notification: {
         MerchantEmails: ['contact@nbweb.solutions'],
         PayerEmail: 'contact@nbweb.solutions',
         SuccessNotifyUrl: `https://6k4vq9ct-5000.euw.devtunnels.ms/api/payment-notification-success/?token=${customToken}`,
         FailNotifyUrl: `https://6k4vq9ct-5000.euw.devtunnels.ms/api/payment-notification-failure/?token=${customToken}`,
       },
+      */
     };
     const res = await axios.post('https://test.saferpay.com/api/Payment/v1/PaymentPage/Initialize', data, header);
     setCacheWithExpiration(customToken, res.data.Token);
