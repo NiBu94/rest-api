@@ -2,8 +2,11 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 import merge from 'lodash.merge';
 
-const env = process.env.NODE_ENV || 'local';
-const port = process.env.PORT || '5000';
+const env = process.env.NODE_ENV;
+const port = process.env.PORT;
+const appURL = process.env.APP_URL;
+const api = process.env.API;
+const saferpayURL = process.env.SAFERPAY_URL;
 
 let envConfig;
 
@@ -17,6 +20,9 @@ export default merge(
   {
     env,
     port,
+    appURL,
+    api,
+    saferpayURL,
     secrets: {
       saferpayAuth: process.env.SAFERPAY_AUTH,
       smtpHost: process.env.SMTP_HOST,

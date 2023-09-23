@@ -1,61 +1,46 @@
-import winston from 'winston';
-import morgan from 'morgan';
+import { createLogger, format, transports } from 'winston';
+import morganLogger from 'morgan';
 import path from 'path';
 import fs from 'fs';
 import config from './config';
 
+const { combine, timestamp, printf, colorize } = format;
 
 const logDir = path.join(__dirname, '..', '..', 'logs');
 
-if (config.env !== 'local' && !fs.existsSync(logDir)) {
+if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
 
-let transports = [];
+const customFormat = printf(({ level, message, label, timestamp }) => {
+  return `${timestamp} ${level}: ${message}`;
+});
+
+export const logger = createLogger({
+  level: 'info',
+  format: combine(timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }), customFormat),
+  transports: [
+    new transports.File({ filename: path.join(logDir, 'error.log'), level: 'error' }),
+    new transports.File({ filename: path.join(logDir, 'combined.log') }),
+  ],
+});
 
 if (config.env === 'local') {
-  transports.push(
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    })
-  );
-} else {
-  transports.push(
-    new winston.transports.File({
-      filename: path.join(logDir, 'error.log'),
-      level: 'error',
-    }),
-    new winston.transports.File({
-      filename: path.join(logDir, 'combined.log'),
+  logger.add(
+    new transports.Console({
+      format: combine(timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }), customFormat, colorize()),
     })
   );
 }
 
-const formatDate = () => {
-  const d = new Date();
-  const pad = (num) => (num < 10 ? '0' + num : num);
-  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(
-    d.getUTCSeconds()
-  )}`;
-};
-
-const customFormat = winston.format.printf(({ timestamp, level, message, ...metadata }) => {
-  return `${formatDate()} [${level}]: ${message} ${Object.keys(metadata).length ? JSON.stringify(metadata) : ''}`;
-});
-
-export const winstonLogger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(winston.format.timestamp(), customFormat),
-  transports: transports,
-});
-
 // Morgan
-morgan.token('body', function (req, res) {
+/*
+morganLogger.token('body', function (req, res) {
   return JSON.stringify(req.body);
 });
 
 const logFormat = ':method :url :status :response-time ms - :res[content-length] - Body:\n :body';
-
+*/
 let morganStream;
 
 if (config.env === 'local') {
@@ -66,6 +51,6 @@ if (config.env === 'local') {
   });
 }
 
-export const morganLogger = morgan(logFormat, {
+export const morgan = morganLogger(config.env === 'local' ? 'dev' : 'common', {
   stream: morganStream,
 });
