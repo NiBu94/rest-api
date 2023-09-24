@@ -1,5 +1,5 @@
 import { createLogger, format, transports } from 'winston';
-import morganLogger from 'morgan';
+import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
 import config from './config';
@@ -12,7 +12,7 @@ if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
 
-const customFormat = printf(({ level, message, label, timestamp }) => {
+const customFormat = printf(({ level, message, timestamp }) => {
   return `${timestamp} ${level}: ${message}`;
 });
 
@@ -51,6 +51,6 @@ if (config.env === 'local') {
   });
 }
 
-export const morgan = morganLogger(config.env === 'local' ? 'dev' : 'common', {
+export const morganFile = morgan(config.env === 'local' ? 'dev' : 'common', {
   stream: morganStream,
 });

@@ -7,6 +7,7 @@ const port = process.env.PORT;
 const appURL = process.env.APP_URL;
 const api = process.env.API;
 const saferpayURL = process.env.SAFERPAY_URL;
+const terminalId = process.env.SAFERPAY_TERMINAL_ID;
 
 let envConfig;
 
@@ -23,6 +24,7 @@ export default merge(
     appURL,
     api,
     saferpayURL,
+    terminalId,
     secrets: {
       saferpayAuth: process.env.SAFERPAY_AUTH,
       smtpHost: process.env.SMTP_HOST,

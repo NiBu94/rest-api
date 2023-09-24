@@ -1,7 +1,5 @@
 import axios from 'axios';
-import crypto from 'crypto';
 import config from '../configs/config';
-import prisma from '../configs/db';
 import { logger } from '../configs/loggers';
 
 const auth = config.secrets.saferpayAuth;
@@ -12,13 +10,6 @@ const header = {
     Accept: 'application/json',
     Authorization: `Basic ${auth}`,
   },
-};
-
-const saferpayHeader = {
-  SpecVersion: '1.35',
-  RequestId: 'id',
-  CustomerId: '269924',
-  RetryIndicator: 0,
 };
 
 export const tokenCache = {};
@@ -44,19 +35,23 @@ export const setStatusCache = (customToken, obj) => {
   }, expirationInMs);
 };
 
-export const createPayment = async (price) => {
+export const createPayment = async (price, customToken, orderId, customerId) => {
   try {
-    const customToken = crypto.randomBytes(16).toString('hex');
     const data = {
-      RequestHeader: saferpayHeader,
-      TerminalId: '17759815',
+      RequestHeader:  {
+        SpecVersion: '1.35',
+        RequestId: 'id',
+        CustomerId: '269924',
+        RetryIndicator: 0,
+      },
+      TerminalId: config.terminalId,
       Payment: {
         Amount: {
           Value: price,
           CurrencyCode: 'CHF',
         },
-        OrderId: '1',
-        Description: 'OrderDescription',
+        OrderId: orderId,
+        Description: 'Bezahlung für Kindercamps',
       },
       ReturnUrl: {
         Url: `https://neu.vandermerwe.ch/wp/bezahlung-verarbeitet?token=${customToken}`,
@@ -70,7 +65,7 @@ export const createPayment = async (price) => {
       },
       
     };
-    const res = await axios.post(`https://${config.saferpayURL}/${config.api}/Payment/v1/PaymentPage/Initialize`, data, header);
+    const res = await axios.post(`https://${config.saferpayURL}/api/Payment/v1/PaymentPage/Initialize`, data, header);
     setTokenCache(customToken, res.data.Token);
     return res.data;
   } catch (err) {
@@ -84,7 +79,12 @@ export const checkPaymentStatus = async (customToken) => {
     const res = await axios.post(
       `https://${config.saferpayURL}/api/Payment/v1/PaymentPage/Assert`,
       {
-        RequestHeader: saferpayHeader,
+        RequestHeader:  {
+          SpecVersion: '1.35',
+          RequestId: 'id',
+          CustomerId: '269924',
+          RetryIndicator: 0,
+        },
         Token: saferpayToken,
       },
       header
@@ -106,7 +106,12 @@ export const captureOrCancelPayment = async (action, transactionId) => {
     const res = await axios.post(
       `https://${config.saferpayURL}/api/Payment/v1/Transaction/${action}`,
       {
-        RequestHeader: saferpayHeader,
+        RequestHeader:  {
+          SpecVersion: '1.35',
+          RequestId: 'id',
+          CustomerId: '269924',
+          RetryIndicator: 0,
+        },
         TransactionReference: {
           TransactionId: transactionId,
         },

@@ -1,14 +1,19 @@
 import express from 'express';
 import cors from 'cors';
-import { logger, morgan } from './configs/loggers';
+import morgan from 'morgan';
+import { logger, morganFile } from './configs/loggers';
 import router from './routes/payment-router';
+import config from './configs/config';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan);
+if (config.env === 'local') {
+  app.use(morgan('dev'));
+}
+app.use(morganFile);
 
 app.use('/api/payment', router);
 

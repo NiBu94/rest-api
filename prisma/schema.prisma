@@ -27,12 +27,12 @@ model Customer {
   agreementAGB      Boolean
   children          Child[]
   bookings          Booking[]
-  payments          Payment[]
 }
 
 model Child {
-  id                     String    @id @default(uuid())
+  id                     String   @id @default(uuid())
   customerId             String
+  firstChild             Boolean
   firstName              String
   lastName               String
   birthday               DateTime
@@ -43,36 +43,37 @@ model Child {
 }
 
 model Booking {
-  id          String    @id @default(uuid())
+  id          String       @id @default(uuid())
   customerId  String
   createdAt   DateTime     @default(now())
   bookedWeeks BookedWeek[]
   customer    Customer     @relation(fields: [customerId], references: [id])
+  Payment     Payment[]
 }
 
 model BookedWeek {
-  id         String    @id @default(uuid())
+  id         String       @id @default(uuid())
   bookingId  String
   weekName   String
   maxDays    Int
   bookedDays BookedDays[]
-  booking    Booking      @relation(fields: [bookingId], references: [id])
+  booking    Booking?     @relation(fields: [bookingId], references: [id])
 }
 
 model BookedDays {
-  id           String    @id @default(uuid())
+  id           String     @id @default(uuid())
   bookedWeekId String
   bookedDay    String
   bookedWeek   BookedWeek @relation(fields: [bookedWeekId], references: [id])
 }
 
 model Tokens {
-  id           String    @id @default(uuid())
-  customToken  String    @unique
-  paymentToken String    @unique
+  id           String   @id @default(uuid())
+  customToken  String   @unique
+  paymentToken String   @unique
   createdAt    DateTime @default(now())
   expiresAt    DateTime
-  paymentId    String      @unique
+  paymentId    String   @unique
   Payment      Payment? @relation(fields: [paymentId], references: [id])
 }
 
@@ -83,8 +84,8 @@ enum TransactionStatus {
 }
 
 model Payment {
-  id                      String    @id @default(uuid())
-  customerId              String
+  id                      String             @id @default(uuid())
+  bookingId               String
   amount                  Float
   currency                String             @default("CHF")
   orderId                 String
@@ -101,5 +102,5 @@ model Payment {
   captureId               String?
   captureDate             DateTime?
   tokens                  Tokens?
-  customer                Customer           @relation(fields: [customerId], references: [id])
+  booking                 Booking            @relation(fields: [bookingId], references: [id])
 }
