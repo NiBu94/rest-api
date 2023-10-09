@@ -51,6 +51,6 @@ if (config.env === 'local') {
   });
 }
 
-export const morganFile = morgan(config.env === 'local' ? 'dev' : 'common', {
+export const morganFile = morgan('common', {
   stream: morganStream,
 });

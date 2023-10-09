@@ -7,13 +7,14 @@ import config from './configs/config';
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 if (config.env === 'local') {
   app.use(morgan('dev'));
+} else {
+  app.use(morganFile);
 }
-app.use(morganFile);
 
 app.use('/api/payment', router);
 

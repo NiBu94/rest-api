@@ -3,11 +3,6 @@ dotenv.config();
 import merge from 'lodash.merge';
 
 const env = process.env.NODE_ENV;
-const port = process.env.PORT;
-const appURL = process.env.APP_URL;
-const api = process.env.API;
-const saferpayURL = process.env.SAFERPAY_URL;
-const terminalId = process.env.SAFERPAY_TERMINAL_ID;
 
 let envConfig;
 
@@ -20,17 +15,22 @@ if (env === 'production') {
 export default merge(
   {
     env,
-    port,
-    appURL,
-    api,
-    saferpayURL,
-    terminalId,
+    port: process.env.PORT,
+    appURL: process.env.APP_URL,
+    api: process.env.API,
     secrets: {
-      saferpayAuth: process.env.SAFERPAY_AUTH,
-      smtpHost: process.env.SMTP_HOST,
-      smtpPort: process.env.SMTP_PORT,
-      smtpUser: process.env.SMTP_USER,
-      smtpPassword: process.env.SMTP_PASS,
+      saferpay: {
+        auth: process.env.SAFERPAY_AUTH,
+        url: process.env.SAFERPAY_URL,
+        terminalId: process.env.SAFERPAY_TERMINAL_ID,
+        customerId: process.env.SAFERPAY_CUSTOMER_ID,
+      },
+      smtp: {
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
     },
     logging: {
       console: true,

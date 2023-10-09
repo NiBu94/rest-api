@@ -13,7 +13,6 @@ datasource db {
 model Customer {
   id                String    @id @default(uuid())
   createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
   firstName         String
   lastName          String
   street            String
@@ -43,39 +42,41 @@ model Child {
 }
 
 model Booking {
-  id          String       @id @default(uuid())
-  customerId  String
-  createdAt   DateTime     @default(now())
+  id         String     @id @default(uuid())
+  customerId String
+  createdAt  DateTime   @default(now())
   bookedWeeks BookedWeek[]
-  customer    Customer     @relation(fields: [customerId], references: [id])
-  Payment     Payment[]
+  customer   Customer   @relation(fields: [customerId], references: [id])
+  payment    Payment?   
 }
 
 model BookedWeek {
-  id         String       @id @default(uuid())
+  id         Int         @id @default(autoincrement())
   bookingId  String
   weekName   String
   maxDays    Int
   bookedDays BookedDays[]
-  booking    Booking?     @relation(fields: [bookingId], references: [id])
+  booking    Booking?    @relation(fields: [bookingId], references: [id])
 }
 
 model BookedDays {
-  id           String     @id @default(uuid())
-  bookedWeekId String
+  id           Int       @id @default(autoincrement())
+  bookedWeekId Int
   bookedDay    String
   bookedWeek   BookedWeek @relation(fields: [bookedWeekId], references: [id])
 }
 
+
 model Tokens {
-  id           String   @id @default(uuid())
+  id           Int      @id @default(autoincrement())
   customToken  String   @unique
   paymentToken String   @unique
   createdAt    DateTime @default(now())
   expiresAt    DateTime
   paymentId    String   @unique
-  Payment      Payment? @relation(fields: [paymentId], references: [id])
+  payment      Payment? @relation(fields: [paymentId], references: [id])
 }
+
 
 enum TransactionStatus {
   AUTHORIZED
@@ -85,7 +86,7 @@ enum TransactionStatus {
 
 model Payment {
   id                      String             @id @default(uuid())
-  bookingId               String
+  bookingId               String             @unique
   amount                  Float
   currency                String             @default("CHF")
   orderId                 String

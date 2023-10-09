@@ -1,32 +1,29 @@
-import { logger } from '../configs/loggers';
-import { captureOrCancelPayment, checkPaymentStatus, createPayment, statusCache } from '../services/api-saferpay';
+//@ts-nocheck
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
-import { createEntities } from '../configs/db';
+import { logger } from '../configs/loggers';
+import { captureOrCancelPayment, checkPaymentStatus, createPayment, statusCache } from '../services/api-saferpay';
+import { createEntities, updatePaymentWithCaptureDetails } from '../db';
+import { sendEmails } from '../emails/payment-success-emails';
 
 export const initializePayment = async (req, res, next) => {
   try {
     const { bookedWeeks, firstChild, secondChild, customer } = req.body;
-    const customerId = uuidv4();
     let data = {
-      id: customerId,
-      ...customer, // spread customer object here
+      customer: {
+        ...customer,
+      },
       children: [],
-      bookings: [
-        {
-          bookedWeeks: [],
-          payment: {},
-        },
-      ],
+      bookings: {
+        bookedWeeks: [],
+      },
     };
 
-    // Adding children
-    data.children.push({ firstName: firstChild.firstName });
+    data.children.push(firstChild);
     if (secondChild.firstName !== '') {
-      data.children.push({ firstName: secondChild.firstName });
+      data.children.push(secondChild);
     }
 
-    // Price calculation logic remains unchanged
     const priceMap = {
       5: { 1: 75, 2: 150, 3: 225, 4: 290, 5: 290 },
       4: { 1: 75, 2: 150, 3: 225, 4: 240 },
@@ -41,7 +38,6 @@ export const initializePayment = async (req, res, next) => {
         const maxDays = weekDetails.maxDays;
         const priceObj = priceMap[maxDays];
         const numDays = weekDetails.bookedDays.length;
-        const days = weekDetails.bookedDays;
 
         price += priceObj[numDays];
         if (numDays === maxDays && secondChild.firstName !== '' && !priceReduced) {
@@ -52,16 +48,17 @@ export const initializePayment = async (req, res, next) => {
         const bookedWeekData = {
           weekName,
           maxDays,
-          bookedDays: days.map((day) => ({ bookedDay: day })),
+          bookedDays: weekDetails.bookedDays.map((day) => ({ bookedDay: day })),
         };
-        data.bookings[0].bookedWeeks.push(bookedWeekData);
+        data.bookings.bookedWeeks.push(bookedWeekData);
       }
     }
 
     const customToken = crypto.randomBytes(16).toString('hex');
     const orderId = uuidv4();
-    const resData = await createPayment(price * 100, customToken, orderId, customerId);
-    data.bookings[0].payment = {
+    const resData = await createPayment(price * 100, customToken, orderId);
+
+    data.bookings.payment = {
       amount: price,
       orderId,
       tokens: {
@@ -82,19 +79,23 @@ export const initializePayment = async (req, res, next) => {
 export const paymentStatus = async (req, res, next) => {
   try {
     logger.info(`frontendFirst`);
-    const customToken = req.params.token as string;
+    const customToken = req.params.token;
     let status;
     let transactionId;
+    let paymentId;
+
 
     if (statusCache[customToken]) {
-      ({ status, transactionId } = statusCache[customToken]);
+      ({ status } = statusCache[customToken]);
     } else {
-      ({ status, transactionId } = await checkPaymentStatus(customToken));
+      ({ status, transactionId, paymentId } = await checkPaymentStatus(customToken));
     }
 
     switch (status) {
       case 'AUTHORIZED':
-        const response = await captureOrCancelPayment('Capture', transactionId);
+        ({ paymentId } = await captureOrCancelPayment(customToken, 'Capture', transactionId));
+        await updatePaymentWithCaptureDetails(paymentId);
+        await sendEmails(customToken);
       case 'CAPTURED':
         res.status(200).json({ message: 'Danke für Ihre Bezahlung. Sie erhalten in kürze eine Bestätigungs E-Mail.' });
         break;
@@ -114,17 +115,20 @@ export const paymentSuccess = async (req, res, next) => {
       const customToken = req.params.token as string;
       let status;
       let transactionId;
+      let paymentId;
 
+      const status;
       if (statusCache[customToken]) {
-        ({ status, transactionId } = statusCache[customToken]);
+        ({ status } = statusCache[customToken]);
       } else {
-        ({ status, transactionId } = await checkPaymentStatus(customToken));
+        ({ status, transactionId, paymentId } = await checkPaymentStatus(customToken));
       }
 
       switch (status) {
         case 'AUTHORIZED':
-          const response = await captureOrCancelPayment('Capture', transactionId);
-          logger.info(JSON.stringify(response));
+          ({ paymentId } = await captureOrCancelPayment(customToken, 'Capture', transactionId));
+          await updatePaymentWithCaptureDetails(paymentId);
+          await sendEmails(customToken);
         case 'CAPTURED':
           res.status(200).end();
           logger.info(`notificationFirstEnded`);

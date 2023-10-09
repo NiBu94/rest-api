@@ -1,8 +1,10 @@
+//@ts-nocheck
 import axios from 'axios';
 import config from '../configs/config';
 import { logger } from '../configs/loggers';
+import { getPaymentToken, updatePayment } from '../db';
 
-const auth = config.secrets.saferpayAuth;
+const { auth, url, terminalId, customerId } = config.secrets.saferpay;
 
 const header = {
   headers: {
@@ -35,16 +37,16 @@ export const setStatusCache = (customToken, obj) => {
   }, expirationInMs);
 };
 
-export const createPayment = async (price, customToken, orderId, customerId) => {
+export const createPayment = async (price, customToken, orderId) => {
   try {
     const data = {
-      RequestHeader:  {
+      RequestHeader: {
         SpecVersion: '1.35',
         RequestId: 'id',
-        CustomerId: '269924',
+        CustomerId: customerId,
         RetryIndicator: 0,
       },
-      TerminalId: config.terminalId,
+      TerminalId: terminalId,
       Payment: {
         Amount: {
           Value: price,
@@ -56,16 +58,15 @@ export const createPayment = async (price, customToken, orderId, customerId) => 
       ReturnUrl: {
         Url: `https://neu.vandermerwe.ch/wp/bezahlung-verarbeitet?token=${customToken}`,
       },
-      
+
       Notification: {
         MerchantEmails: ['contact@nbweb.solutions'],
         PayerEmail: 'contact@nbweb.solutions',
         SuccessNotifyUrl: `https://${config.appURL}/${config.api}/payment/success/${customToken}`,
         FailNotifyUrl: `https://${config.appURL}/${config.api}/payment/failure/${customToken}`,
       },
-      
     };
-    const res = await axios.post(`https://${config.saferpayURL}/api/Payment/v1/PaymentPage/Initialize`, data, header);
+    const res = await axios.post(`https://${url}/api/Payment/v1/PaymentPage/Initialize`, data, header);
     setTokenCache(customToken, res.data.Token);
     return res.data;
   } catch (err) {
@@ -75,41 +76,65 @@ export const createPayment = async (price, customToken, orderId, customerId) => 
 
 export const checkPaymentStatus = async (customToken) => {
   try {
-    const saferpayToken = tokenCache[customToken];
+    let saferpayToken = tokenCache[customToken];
+
+    if (!saferpayToken) {
+      saferpayToken = await getPaymentToken(customToken);
+    }
+
     const res = await axios.post(
-      `https://${config.saferpayURL}/api/Payment/v1/PaymentPage/Assert`,
+      `https://${url}/api/Payment/v1/PaymentPage/Assert`,
       {
-        RequestHeader:  {
+        RequestHeader: {
           SpecVersion: '1.35',
           RequestId: 'id',
-          CustomerId: '269924',
+          CustomerId: customerId,
           RetryIndicator: 0,
         },
         Token: saferpayToken,
       },
       header
     );
+
+    const { Status, Type, Id, Date, AcquirerName, AcquirerReference, SixTransactionReference, ApprovalCode } = res.data.Transaction;
+    const { LiabilityShift, LiableEntity } = res.data.Liability;
+
     const obj = {
-      status: res.data.Transaction.Status,
-      transactionId: res.data.Transaction.Id,
+      status: Status,
+      transactionId: Id,
     };
+
+    const data = {
+      transactionStatus: Status,
+      transactionType: Type,
+      transactionId: Id,
+      transactionDate: Date,
+      acquirerName: AcquirerName,
+      acquirerReference: AcquirerReference,
+      sixTransactionReference: SixTransactionReference,
+      approvalCode: ApprovalCode,
+      liabilityShift: LiabilityShift,
+      liableEntity: LiableEntity,
+    };
+
+    obj.paymentId = await updatePayment(customToken, data);
     setStatusCache(customToken, obj);
     return obj;
   } catch (err) {
-    logger.error(JSON.stringify(err.response.data))
+    logger.error(JSON.stringify(err.response.data));
     throw err;
   }
 };
 
-export const captureOrCancelPayment = async (action, transactionId) => {
+export const captureOrCancelPayment = async (customToken, action, transactionId) => {
   try {
     const res = await axios.post(
-      `https://${config.saferpayURL}/api/Payment/v1/Transaction/${action}`,
+      `https://${url}/api/Payment/v1/Transaction/${action}`,
       {
-        RequestHeader:  {
+        RequestHeader: {
           SpecVersion: '1.35',
           RequestId: 'id',
-          CustomerId: '269924',
+          CustomerId: customerId,
           RetryIndicator: 0,
         },
         TransactionReference: {
@@ -118,9 +143,10 @@ export const captureOrCancelPayment = async (action, transactionId) => {
       },
       header
     );
+    setStatusCache(customToken, { status: res.data.Status });
     return res.data;
   } catch (err) {
-    logger.error(JSON.stringify(err.response.data))
+    logger.error(JSON.stringify(err.response.data));
     throw err;
   }
 };
