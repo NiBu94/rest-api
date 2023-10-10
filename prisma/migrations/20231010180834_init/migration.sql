@@ -2,7 +2,6 @@
 CREATE TABLE `Customer` (
     `id` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
     `firstName` VARCHAR(191) NOT NULL,
     `lastName` VARCHAR(191) NOT NULL,
     `street` VARCHAR(191) NOT NULL,
@@ -22,6 +21,7 @@ CREATE TABLE `Customer` (
 CREATE TABLE `Child` (
     `id` VARCHAR(191) NOT NULL,
     `customerId` VARCHAR(191) NOT NULL,
+    `firstChild` BOOLEAN NOT NULL,
     `firstName` VARCHAR(191) NOT NULL,
     `lastName` VARCHAR(191) NOT NULL,
     `birthday` DATETIME(3) NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE `Booking` (
 
 -- CreateTable
 CREATE TABLE `BookedWeek` (
-    `id` VARCHAR(191) NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `bookingId` VARCHAR(191) NOT NULL,
     `weekName` VARCHAR(191) NOT NULL,
     `maxDays` INTEGER NOT NULL,
@@ -53,8 +53,8 @@ CREATE TABLE `BookedWeek` (
 
 -- CreateTable
 CREATE TABLE `BookedDays` (
-    `id` VARCHAR(191) NOT NULL,
-    `bookedWeekId` VARCHAR(191) NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `bookedWeekId` INTEGER NOT NULL,
     `bookedDay` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -62,7 +62,7 @@ CREATE TABLE `BookedDays` (
 
 -- CreateTable
 CREATE TABLE `Tokens` (
-    `id` VARCHAR(191) NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `customToken` VARCHAR(191) NOT NULL,
     `paymentToken` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -78,11 +78,11 @@ CREATE TABLE `Tokens` (
 -- CreateTable
 CREATE TABLE `Payment` (
     `id` VARCHAR(191) NOT NULL,
-    `customerId` VARCHAR(191) NOT NULL,
+    `bookingId` VARCHAR(191) NOT NULL,
     `amount` DOUBLE NOT NULL,
     `currency` VARCHAR(191) NOT NULL DEFAULT 'CHF',
     `orderId` VARCHAR(191) NOT NULL,
-    `transactionStatus` ENUM('AUTHORIZED', 'CAPTURED', 'FAILED') NULL,
+    `transactionStatus` ENUM('AUTHORIZED', 'CAPTURED', 'CANCELED') NULL,
     `transactionType` VARCHAR(191) NULL,
     `transactionId` VARCHAR(191) NULL,
     `transactionDate` DATETIME(3) NULL,
@@ -95,6 +95,7 @@ CREATE TABLE `Payment` (
     `captureId` VARCHAR(191) NULL,
     `captureDate` DATETIME(3) NULL,
 
+    UNIQUE INDEX `Payment_bookingId_key`(`bookingId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -114,4 +115,4 @@ ALTER TABLE `BookedDays` ADD CONSTRAINT `BookedDays_bookedWeekId_fkey` FOREIGN K
 ALTER TABLE `Tokens` ADD CONSTRAINT `Tokens_paymentId_fkey` FOREIGN KEY (`paymentId`) REFERENCES `Payment`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Payment` ADD CONSTRAINT `Payment_customerId_fkey` FOREIGN KEY (`customerId`) REFERENCES `Customer`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Payment` ADD CONSTRAINT `Payment_bookingId_fkey` FOREIGN KEY (`bookingId`) REFERENCES `Booking`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
