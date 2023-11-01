@@ -1,37 +1,42 @@
 //@ts-nocheck
 import { PrismaClient } from '@prisma/client';
+import { logger } from './configs/loggers';
 const prisma = new PrismaClient();
 
 export const createEntities = async (data) => {
-  await prisma.customer.create({
-    data: {
-      ...data.customer,
-      children: {
-        create: data.children,
-      },
-      bookings: {
-        create: {
-          bookedWeeks: {
-            create: data.bookings.bookedWeeks.map((week) => ({
-              weekName: week.weekName,
-              maxDays: week.maxDays,
-              bookedDays: {
-                create: week.bookedDays,
-              },
-            })),
-          },
-          payment: {
-            create: {
-              ...data.bookings.payment,
-              tokens: {
-                create: data.bookings.payment.tokens,
+  try {
+    await prisma.customer.create({
+      data: {
+        ...data.customer,
+        children: {
+          create: data.children,
+        },
+        bookings: {
+          create: {
+            bookedWeeks: {
+              create: data.bookings.bookedWeeks.map((week) => ({
+                weekName: week.weekName,
+                maxDays: week.maxDays,
+                bookedDays: {
+                  create: week.bookedDays,
+                },
+              })),
+            },
+            payment: {
+              create: {
+                ...data.bookings.payment,
+                tokens: {
+                  create: data.bookings.payment.tokens,
+                },
               },
             },
           },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    logger.error(error.message);
+  }
 };
 
 export const getPaymentToken = async (customToken) => {

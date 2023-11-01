@@ -68,7 +68,7 @@ export const initializePayment = async (req, res, next) => {
       },
     };
 
-    createEntities(data);
+    await createEntities(data);
     res.json({ redirectURL: resData.RedirectUrl });
   } catch (err) {
     logger.error(JSON.stringify(err.response.data));

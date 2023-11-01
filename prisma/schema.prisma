@@ -3,7 +3,7 @@
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-1.0.x"]  // replace 1.x.x with the appropriate version
+  binaryTargets = ["rhel-openssl-1.1.x"]  // replace 1.x.x with the appropriate version
 }
 
 
