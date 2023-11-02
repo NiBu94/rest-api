@@ -60,7 +60,7 @@ export const createPayment = async (price, customToken, orderId, customerEmail) 
       },
 
       Notification: {
-        MerchantEmails: ['contact@nbweb.solutions'],
+        MerchantEmails: ['lea@vandermerwe.ch', 'contact@nbweb.solutions'],
         PayerEmail: customerEmail,
         SuccessNotifyUrl: `https://${config.appURL}/${config.api}/payment/success/${customToken}`,
         FailNotifyUrl: `https://${config.appURL}/${config.api}/payment/failure/${customToken}`,
