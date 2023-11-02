@@ -20,7 +20,7 @@ export const initializePayment = async (req, res, next) => {
     };
 
     data.children.push(firstChild);
-    if (secondChild.firstName !== '') {
+    if (secondChild.firstName) {
       data.children.push(secondChild);
     }
 
