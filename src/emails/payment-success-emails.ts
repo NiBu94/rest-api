@@ -122,44 +122,49 @@ export const sendEmails = async (customToken) => {
     </tr>
     <tr>
     <td style="width: 40%;">Allergien</td>
-    <td style="width: 60%;">${firstChild.allergies.replace(/\n/g, '<br>')}</td>
+    <td style="width: 60%;">${firstChild.allergies ? firstChild.allergies.replace(/\n/g, '<br>') : 'Keine'}</td>
     </tr>
     <tr>
     <td style="width: 40%;">&nbsp</td>
     <td style="width: 60%;">&nbsp</td>
-    </tr>
-    <tr>
-    <td style="width: 40%;"><strong>Geschwisterkind</strong></td>
-    <td style="width: 60%;"></td>
-    </tr>
-    <tr>
-    <td style="width: 40%;">Vorname</td>
-    <td style="width: 60%;">${secondChild.firstName}</td>
-    </tr>
-    <tr>
-    <td style="width: 40%;">Nachname</td>
-    <td style="width: 60%;">${secondChild.lastName}</td>
-    </tr>
-    <tr>
-    <td style="width: 40%;">Geburtstag</td>
-    <td style="width: 60%;">${secondChild.birthday}</td>
-    </tr>
-    <tr>
-    <td style="width: 40%;">Geschlecht</td>
-    <td style="width: 60%;">${secondChild.gender}</td>
-    </tr>
-    <tr>
-    <td style="width: 40%;">Alleine nach Hause</td>
-    <td style="width: 60%;">${secondChild.allowanceToGoHomeAlone ? 'Ja' : 'Nein'}</td>
-    </tr>
-    <tr>
-    <td style="width: 40%;">Allergien</td>
-    <td style="width: 60%;">${secondChild.allergies.replace(/\n/g, '<br>')}</td>
-    </tr>
-    <tr>
-    <td style="width: 40%;">&nbsp</td>
-    <td style="width: 60%;">&nbsp</td>
-    </tr>
+    </tr>`;
+    if (secondChild.firstName) {
+      ownerContent += `
+      <tr>
+      <td style="width: 40%;"><strong>Geschwisterkind</strong></td>
+      <td style="width: 60%;"></td>
+      </tr>
+      <tr>
+      <td style="width: 40%;">Vorname</td>
+      <td style="width: 60%;">${secondChild.firstName}</td>
+      </tr>
+      <tr>
+      <td style="width: 40%;">Nachname</td>
+      <td style="width: 60%;">${secondChild.lastName}</td>
+      </tr>
+      <tr>
+      <td style="width: 40%;">Geburtstag</td>
+      <td style="width: 60%;">${secondChild.birthday}</td>
+      </tr>
+      <tr>
+      <td style="width: 40%;">Geschlecht</td>
+      <td style="width: 60%;">${secondChild.gender}</td>
+      </tr>
+      <tr>
+      <td style="width: 40%;">Alleine nach Hause</td>
+      <td style="width: 60%;">${secondChild.allowanceToGoHomeAlone ? 'Ja' : 'Nein'}</td>
+      </tr>
+      <tr>
+      <td style="width: 40%;">Allergien</td>
+      <td style="width: 60%;">${secondChild.allergies ? secondChild.allergies.replace(/\n/g, '<br>') : 'Keine'}</td>
+      </tr>
+      <tr>
+      <td style="width: 40%;">&nbsp</td>
+      <td style="width: 60%;">&nbsp</td>
+      </tr>
+      `;
+    }
+    ownerContent += `
     <tr>
     <td style="width: 40%;"><strong>Kontaktperson</strong></td>
     <td style="width: 60%;"></td>
@@ -198,7 +203,7 @@ export const sendEmails = async (customToken) => {
     </tr>
     <tr>
     <td style="width: 40%;">Telefon_2</td>
-    <td style="width: 60%;">${customer.secondPhoneNumber}</td>
+    <td style="width: 60%;">${customer.secondPhoneNumber ? customer.secondPhoneNumber : 'Keine'}</td>
     </tr>
     <tr>
     <td style="width: 40%;">&nbsp</td>
@@ -233,7 +238,7 @@ export const sendEmails = async (customToken) => {
     </tr>
     <tr>
     <td style="width: 40%;">Nachricht</td>
-    <td style="width: 60%;">${customer.optionalMessage}</td>
+    <td style="width: 60%;">${customer.optionalMessage ? customer.optionalMessage.replace(/\n/g, '<br>') : 'Keine'}</td>
     </tr>
     <tr>
     <td style="width: 40%;">AGB Akzeptiert</td>
@@ -245,7 +250,7 @@ export const sendEmails = async (customToken) => {
     const mailOptionsOwner = {
       from: user,
       to: 'contact@nbweb.solutions',
-      subject: `Betreff: Van der Merwe Center - Anmeldung Kindercamp (${customer.firstName}, ${customer.lastName})`,
+      subject: `Betreff: Van der Merwe Center - Anmeldung Kindercamp (${customer.firstName} ${customer.lastName})`,
       html: ownerContent,
     };
 
