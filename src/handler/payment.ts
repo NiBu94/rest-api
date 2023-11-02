@@ -56,7 +56,7 @@ export const initializePayment = async (req, res, next) => {
 
     const customToken = crypto.randomBytes(16).toString('hex');
     const orderId = uuidv4();
-    const resData = await createPayment(price * 100, customToken, orderId);
+    const resData = await createPayment(price * 100, customToken, orderId, data.customer.email);
 
     data.bookings.payment = {
       amount: price,
