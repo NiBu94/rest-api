@@ -62,8 +62,8 @@ export const createPayment = async (price, customToken, orderId, customerEmail) 
       Notification: {
         MerchantEmails: ['lea@vandermerwe.ch', 'contact@nbweb.solutions'],
         PayerEmail: customerEmail,
-        SuccessNotifyUrl: `https://${config.appURL}/${config.api}/payment/success/${customToken}`,
-        FailNotifyUrl: `https://${config.appURL}/${config.api}/payment/failure/${customToken}`,
+        // SuccessNotifyUrl: `https://${config.appURL}/${config.api}/payment/success/${customToken}`,
+        // FailNotifyUrl: `https://${config.appURL}/${config.api}/payment/failure/${customToken}`,
       },
     };
     const res = await axios.post(`https://${url}/api/Payment/v1/PaymentPage/Initialize`, data, header);
