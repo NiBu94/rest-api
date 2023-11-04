@@ -3,75 +3,41 @@ import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../configs/loggers';
 import { captureOrCancelPayment, checkPaymentStatus, createPayment, statusCache } from '../services/api-saferpay';
-import { createEntities, updatePaymentWithCaptureDetails } from '../db';
+import db from '../db';
 import { sendEmails } from '../emails/payment-success-emails';
 
 export const initializePayment = async (req, res, next) => {
   try {
     const { bookedWeeks, firstChild, secondChild, customer } = req.body;
-    let data = {
-      customer: {
-        ...customer,
-      },
-      children: [],
-      bookings: {
-        bookedWeeks: [],
-      },
-    };
-
-    data.children.push(firstChild);
-    if (secondChild.firstName) {
-      data.children.push(secondChild);
-    }
-
     const priceMap = {
       5: { 1: 75, 2: 150, 3: 225, 4: 290, 5: 290 },
       4: { 1: 75, 2: 150, 3: 225, 4: 240 },
       3: { 1: 75, 2: 150, 3: 180 },
     };
     let price = 0;
-    let priceReduced = false;
 
     for (const weekObj of bookedWeeks) {
+      let priceReduced = false;
       for (const weekName in weekObj) {
         const weekDetails = weekObj[weekName];
         const maxDays = weekDetails.maxDays;
         const priceObj = priceMap[maxDays];
-        const numDays = weekDetails.bookedDays.length;
+        const daysLength = weekDetails.bookedDays.length;
 
-        price += priceObj[numDays];
-        if (numDays === maxDays && secondChild.firstName !== '' && !priceReduced) {
+        price += priceObj[daysLength];
+        if (daysLength === maxDays && secondChild.firstName && !priceReduced) {
           price -= 20;
           priceReduced = true;
         }
-
-        const bookedWeekData = {
-          weekName,
-          maxDays,
-          bookedDays: weekDetails.bookedDays.map((day) => ({ bookedDay: day })),
-        };
-        data.bookings.bookedWeeks.push(bookedWeekData);
       }
     }
 
     const customToken = crypto.randomBytes(16).toString('hex');
     const orderId = uuidv4();
-    const resData = await createPayment(price * 100, customToken, orderId, data.customer.email);
-
-    data.bookings.payment = {
-      amount: price,
-      orderId,
-      tokens: {
-        customToken,
-        paymentToken: resData.Token,
-        expiresAt: resData.Expiration,
-      },
-    };
-
-    await createEntities(data);
-    res.json({ redirectURL: resData.RedirectUrl });
+    const redirectURL = await createPayment(price * 100, customToken, orderId, customer.email);
+    res.status(201).json({ redirectURL }); // stopped here
   } catch (err) {
-    logger.error(JSON.stringify(err.response.data));
+    // logger.error(JSON.stringify(err.response.data));
     next(err);
   }
 };
@@ -83,7 +49,6 @@ export const paymentStatus = async (req, res, next) => {
     let status;
     let transactionId;
     let paymentId;
-
 
     if (statusCache[customToken]) {
       ({ status } = statusCache[customToken]);

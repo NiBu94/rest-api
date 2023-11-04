@@ -3,7 +3,37 @@ import { PrismaClient } from '@prisma/client';
 import { logger } from './configs/loggers';
 const prisma = new PrismaClient();
 
-export const createEntities = async (data) => {
+const createCustomer = async (data) => {
+  return await prisma.customer.create({
+    data,
+  });
+};
+
+const createChildren = async (data) => {
+  await prisma.child.createMany({
+    data,
+  });
+};
+
+const createBooking = async (data) => {
+  return await prisma.booking.create({
+    data: data.customerId,
+    bookedWeeks: {
+      create: data.bookedWeeks,
+      bookedDays: {
+        create: data.bookedDays,
+      },
+    },
+    payment: {
+      create: data.payment,
+      tokens: {
+        create: data.tokens,
+      },
+    },
+  });
+};
+
+const createEntities = async (data) => {
   try {
     await prisma.customer.create({
       data: {
@@ -39,50 +69,40 @@ export const createEntities = async (data) => {
   }
 };
 
-export const getPaymentToken = async (customToken) => {
-  try {
-    const { paymentToken } = await prisma.tokens.findUnique({
-      where: {
-        customToken,
-      },
-      select: {
-        paymentToken: true,
-      },
-    });
-    return paymentToken;
-  } catch (error) {}
+const getPaymentToken = async (customToken) => {
+  const { paymentToken } = await prisma.tokens.findUnique({
+    where: {
+      customToken,
+    },
+    select: {
+      paymentToken: true,
+    },
+  });
+  return paymentToken;
 };
 
-export const updatePayment = async (customToken, data) => {
-  try {
-    const { paymentId } = await prisma.tokens.findUnique({
-      where: {
-        customToken,
-      },
-      select: {
-        paymentId: true,
-      },
-    });
-
-    if (!paymentId) {
-      throw new Error('Token not found');
-    }
-
-    await prisma.payment.update({
-      where: {
-        id: paymentId,
-      },
-      data: data,
-    });
-
-    return paymentId;
-  } catch (error) {
-    console.error('Error updating payment:', error);
-    throw error;
-  }
+const getPaymentId = async (customToken) => {
+  const { paymentId } = await prisma.tokens.findUnique({
+    where: {
+      customToken,
+    },
+    select: {
+      paymentId: true,
+    },
+  });
+  return paymentId;
 };
 
-export const updatePaymentWithCaptureDetails = async (paymentId, data) => {
+const updatePayment = async (paymentId, data) => {
+  await prisma.payment.update({
+    where: {
+      id: paymentId,
+    },
+    data,
+  });
+};
+
+const updatePaymentWithCaptureDetails = async (paymentId, data) => {
   try {
     await prisma.payment.update({
       where: {
@@ -93,30 +113,28 @@ export const updatePaymentWithCaptureDetails = async (paymentId, data) => {
   } catch (error) {}
 };
 
-export const getDataForEmails = async (customToken) => {
-  try {
-    const result = await prisma.tokens.findUnique({
-      where: {
-        customToken,
-      },
-      select: {
-        payment: {
-          select: {
-            amount: true,
-            booking: {
-              select: {
-                customer: {
-                  include: {
-                    children: true,
-                  },
+const getDataForEmails = async (customToken) => {
+  return await prisma.tokens.findUnique({
+    where: {
+      customToken,
+    },
+    select: {
+      payment: {
+        select: {
+          amount: true,
+          booking: {
+            select: {
+              customer: {
+                include: {
+                  children: true,
                 },
-                bookedWeeks: {
-                  select: {
-                    weekName: true,
-                    bookedDays: {
-                      select: {
-                        bookedDay: true,
-                      },
+              },
+              bookedWeeks: {
+                select: {
+                  weekName: true,
+                  bookedDays: {
+                    select: {
+                      bookedDay: true,
                     },
                   },
                 },
@@ -125,11 +143,18 @@ export const getDataForEmails = async (customToken) => {
           },
         },
       },
-    });
+    },
+  });
+};
 
-    return result;
-  } catch (error) {
-    console.error('Error fetching customer:', error);
-    throw error;
-  }
+export default {
+  customer: {
+    create: createCustomer,
+  },
+  child: {
+    createMany: createChildren,
+  },
+  booking: {
+    create: createBooking,
+  },
 };

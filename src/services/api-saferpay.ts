@@ -14,64 +14,36 @@ const header = {
   },
 };
 
-export const tokenCache = {};
-export const statusCache = {};
-
-export const setTokenCache = (customToken, paymentToken) => {
-  const expirationInMs = 60 * 60 * 500; // 30 minutes
-  tokenCache[customToken] = paymentToken;
-
-  // Remove the entry after the expiration time
-  setTimeout(() => {
-    delete tokenCache[customToken];
-  }, expirationInMs);
-};
-
-export const setStatusCache = (customToken, obj) => {
-  const expirationInMs = 60 * 60 * 500; // 30 minutes
-  statusCache[customToken] = obj;
-
-  // Remove the entry after the expiration time
-  setTimeout(() => {
-    delete statusCache[customToken];
-  }, expirationInMs);
-};
-
 export const createPayment = async (price, customToken, orderId, customerEmail) => {
-  try {
-    const data = {
-      RequestHeader: {
-        SpecVersion: '1.35',
-        RequestId: 'id',
-        CustomerId: customerId,
-        RetryIndicator: 0,
+  const data = {
+    RequestHeader: {
+      SpecVersion: '1.35',
+      RequestId: 'id',
+      CustomerId: customerId,
+      RetryIndicator: 0,
+    },
+    TerminalId: terminalId,
+    Payment: {
+      Amount: {
+        Value: price,
+        CurrencyCode: 'CHF',
       },
-      TerminalId: terminalId,
-      Payment: {
-        Amount: {
-          Value: price,
-          CurrencyCode: 'CHF',
-        },
-        OrderId: orderId,
-        Description: 'Bezahlung für Kindercamps',
-      },
-      ReturnUrl: {
-        Url: `https://neu.vandermerwe.ch/wp/bezahlung-verarbeitet?token=${customToken}`,
-      },
+      OrderId: orderId,
+      Description: 'Bezahlung für Kindercamps',
+    },
+    ReturnUrl: {
+      Url: `https://neu.vandermerwe.ch/wp/bezahlung-verarbeitet?token=${customToken}`,
+    },
 
-      Notification: {
-        MerchantEmails: ['lea@vandermerwe.ch', 'contact@nbweb.solutions'],
-        PayerEmail: customerEmail,
-        // SuccessNotifyUrl: `https://${config.appURL}/${config.api}/payment/success/${customToken}`,
-        // FailNotifyUrl: `https://${config.appURL}/${config.api}/payment/failure/${customToken}`,
-      },
-    };
-    const res = await axios.post(`https://${url}/api/Payment/v1/PaymentPage/Initialize`, data, header);
-    setTokenCache(customToken, res.data.Token);
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+    Notification: {
+      MerchantEmails: ['lea@vandermerwe.ch', 'contact@nbweb.solutions'],
+      PayerEmail: customerEmail,
+      // SuccessNotifyUrl: `https://${config.appURL}/${config.api}/payment/success/${customToken}`,
+      // FailNotifyUrl: `https://${config.appURL}/${config.api}/payment/failure/${customToken}`,
+    },
+  };
+  const response = await axios.post(`https://${url}/api/Payment/v1/PaymentPage/Initialize`, data, header);
+  return response.data.RedirectUrl;
 };
 
 export const checkPaymentStatus = async (customToken) => {
