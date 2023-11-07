@@ -22,10 +22,14 @@ export const initializePayment = async (req, res, next) => {
       children.push(secondChild);
     }
     await db.child.createMany(children);
-    const booking = { customerId };
 
+    const booking = {
+      customerId,
+      bookedWeeks: {
+        create: [],
+      },
+    };
     let price = 0;
-
     for (const week of bookedWeeks) {
       price += priceMap[week.maxDays][week.bookedDays.length];
       if (week.bookedDays.length === week.maxDays && secondChild.firstName) {

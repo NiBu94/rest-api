@@ -21,22 +21,12 @@ const createChildren = async (data) => {
 
 const createBooking = async (data) => {
   return await prisma.booking.create({
-    data: data.customerId,
-    bookedWeeks: {
-      create: {
-        weekName: data.weekName,
-        maxDays: data.maxDays,
-        bookedDays: {
-          create: data.bookedDays,
-        },
-      },
-    },
-    payment: {
-      create: data.payment,
-      tokens: {
-        create: data.tokens,
-      },
-    },
+    data,
+  });
+};
+export const createPayment = async (data) => {
+  return await prisma.payment.create({
+    data,
   });
 };
 

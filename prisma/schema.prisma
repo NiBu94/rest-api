@@ -3,9 +3,8 @@
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native"]  // replace 1.x.x with the appropriate version
+  binaryTargets = ["native"] // replace 1.x.x with the appropriate version
 }
-
 
 datasource db {
   provider = "mysql"
@@ -44,30 +43,29 @@ model Child {
 }
 
 model Booking {
-  id         String     @id @default(uuid())
+  id         String   @id @default(uuid())
   customerId String
-  createdAt  DateTime   @default(now())
-  bookedWeeks BookedWeek[]
-  customer   Customer   @relation(fields: [customerId], references: [id])
-  payment    Payment?   
+  createdAt  DateTime @default(now())
+  weeks      Week[]
+  customer   Customer @relation(fields: [customerId], references: [id])
+  payment    Payment?
 }
 
-model BookedWeek {
-  id         Int         @id @default(autoincrement())
-  bookingId  String
-  weekName   String
-  maxDays    Int
-  bookedDays BookedDays[]
-  booking    Booking?    @relation(fields: [bookingId], references: [id])
+model Week {
+  id        Int      @id @default(autoincrement())
+  bookingId String
+  name      String
+  maxDays   Int
+  days      Day[]
+  booking   Booking? @relation(fields: [bookingId], references: [id])
 }
 
-model BookedDays {
-  id           Int       @id @default(autoincrement())
+model Day {
+  id           Int    @id @default(autoincrement())
   bookedWeekId Int
-  bookedDay    String
-  bookedWeek   BookedWeek @relation(fields: [bookedWeekId], references: [id])
+  day          String
+  week         Week   @relation(fields: [bookedWeekId], references: [id])
 }
-
 
 model Tokens {
   id           Int      @id @default(autoincrement())
@@ -78,7 +76,6 @@ model Tokens {
   paymentId    String   @unique
   payment      Payment? @relation(fields: [paymentId], references: [id])
 }
-
 
 enum TransactionStatus {
   AUTHORIZED
