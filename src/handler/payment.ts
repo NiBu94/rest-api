@@ -14,30 +14,32 @@ export const initializePayment = async (req, res, next) => {
       4: { 1: 75, 2: 150, 3: 225, 4: 240 },
       3: { 1: 75, 2: 150, 3: 180 },
     };
+    const customerId = await db.customer.create(customer);
+    firstChild.customerId = customerId;
+    const children = [firstChild];
+    if (secondChild.firstName) {
+      secondChild.customerId = customerId;
+      children.push(secondChild);
+    }
+    await db.child.createMany(children);
+    const booking = { customerId };
+
     let price = 0;
 
-    for (const weekObj of bookedWeeks) {
-      let priceReduced = false;
-      for (const weekName in weekObj) {
-        const weekDetails = weekObj[weekName];
-        const maxDays = weekDetails.maxDays;
-        const priceObj = priceMap[maxDays];
-        const daysLength = weekDetails.bookedDays.length;
-
-        price += priceObj[daysLength];
-        if (daysLength === maxDays && secondChild.firstName && !priceReduced) {
-          price -= 20;
-          priceReduced = true;
-        }
+    for (const week of bookedWeeks) {
+      price += priceMap[week.maxDays][week.bookedDays.length];
+      if (week.bookedDays.length === week.maxDays && secondChild.firstName) {
+        price -= 20;
       }
     }
 
     const customToken = crypto.randomBytes(16).toString('hex');
     const orderId = uuidv4();
+    await db.booking.create();
     const redirectURL = await createPayment(price * 100, customToken, orderId, customer.email);
-    res.status(201).json({ redirectURL }); // stopped here
+    res.status(201).json({ redirectURL });
   } catch (err) {
-    // logger.error(JSON.stringify(err.response.data));
+    logger.error(err.message);
     next(err);
   }
 };

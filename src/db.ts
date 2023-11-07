@@ -4,9 +4,13 @@ import { logger } from './configs/loggers';
 const prisma = new PrismaClient();
 
 const createCustomer = async (data) => {
-  return await prisma.customer.create({
+  const { id } = await prisma.customer.create({
     data,
+    select: {
+      id: true,
+    },
   });
+  return id;
 };
 
 const createChildren = async (data) => {
@@ -19,9 +23,12 @@ const createBooking = async (data) => {
   return await prisma.booking.create({
     data: data.customerId,
     bookedWeeks: {
-      create: data.bookedWeeks,
-      bookedDays: {
-        create: data.bookedDays,
+      create: {
+        weekName: data.weekName,
+        maxDays: data.maxDays,
+        bookedDays: {
+          create: data.bookedDays,
+        },
       },
     },
     payment: {

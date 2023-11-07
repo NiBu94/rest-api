@@ -19,7 +19,7 @@ if (config.env === 'local') {
 app.use('/api/payment', router);
 
 app.use((err, req, res, next) => {
-  logger.error(err.message);
+  // logger.error(err.stack);
   res.status(500).json({ message: err.message });
 });
 export default app;
