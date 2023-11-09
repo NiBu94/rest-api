@@ -1,8 +1,6 @@
 //@ts-nocheck
 import axios from 'axios';
 import config from '../configs/config';
-import { logger } from '../configs/loggers';
-import { getPaymentToken, updatePayment } from '../db';
 
 const { auth, url, terminalId, customerId } = config.secrets.saferpay;
 
@@ -14,7 +12,7 @@ const header = {
   },
 };
 
-export const createPayment = async (price, customToken, orderId, customerEmail) => {
+const createPayment = async (price, customToken, orderId, customerEmail) => {
   const data = {
     RequestHeader: {
       SpecVersion: '1.35',
@@ -32,93 +30,58 @@ export const createPayment = async (price, customToken, orderId, customerEmail) 
       Description: 'Bezahlung für Kindercamps',
     },
     ReturnUrl: {
-      Url: `https://neu.vandermerwe.ch/wp/bezahlung-verarbeitet?token=${customToken}`,
+      Url: `https://neu.vandermerwe.ch/wp/bezahlung-verarbeitet?customToken=${customToken}`,
     },
 
     Notification: {
-      MerchantEmails: ['lea@vandermerwe.ch', 'contact@nbweb.solutions'],
+      MerchantEmails: [/*'lea@vandermerwe.ch',*/ 'contact@nbweb.solutions'],
       PayerEmail: customerEmail,
-      // SuccessNotifyUrl: `https://${config.appURL}/${config.api}/payment/success/${customToken}`,
-      // FailNotifyUrl: `https://${config.appURL}/${config.api}/payment/failure/${customToken}`,
+      SuccessNotifyUrl: `https://${config.appURL}/${config.api}/payment?customToken=${customToken}`,
+      FailNotifyUrl: `https://${config.appURL}/${config.api}/payment?customToken=${customToken}`,
     },
   };
   const response = await axios.post(`https://${url}/api/Payment/v1/PaymentPage/Initialize`, data, header);
-  return response.data.RedirectUrl;
+  return response;
 };
 
-export const checkPaymentStatus = async (customToken) => {
-  try {
-    let saferpayToken = tokenCache[customToken];
-
-    if (!saferpayToken) {
-      saferpayToken = await getPaymentToken(customToken);
-    }
-
-    const res = await axios.post(
-      `https://${url}/api/Payment/v1/PaymentPage/Assert`,
-      {
-        RequestHeader: {
-          SpecVersion: '1.35',
-          RequestId: 'id',
-          CustomerId: customerId,
-          RetryIndicator: 0,
-        },
-        Token: saferpayToken,
+const checkPaymentStatus = async (paymentToken) => {
+  const response = await axios.post(
+    `https://${url}/api/Payment/v1/PaymentPage/Assert`,
+    {
+      RequestHeader: {
+        SpecVersion: '1.35',
+        RequestId: 'id',
+        CustomerId: customerId,
+        RetryIndicator: 0,
       },
-      header
-    );
-
-    const { Status, Type, Id, Date, AcquirerName, AcquirerReference, SixTransactionReference, ApprovalCode } = res.data.Transaction;
-    const { LiabilityShift, LiableEntity } = res.data.Liability;
-
-    const obj = {
-      status: Status,
-      transactionId: Id,
-    };
-
-    const data = {
-      transactionStatus: Status,
-      transactionType: Type,
-      transactionId: Id,
-      transactionDate: Date,
-      acquirerName: AcquirerName,
-      acquirerReference: AcquirerReference,
-      sixTransactionReference: SixTransactionReference,
-      approvalCode: ApprovalCode,
-      liabilityShift: LiabilityShift,
-      liableEntity: LiableEntity,
-    };
-
-    obj.paymentId = await updatePayment(customToken, data);
-    setStatusCache(customToken, obj);
-    return obj;
-  } catch (err) {
-    logger.error(JSON.stringify(err.response.data));
-    throw err;
-  }
+      Token: paymentToken,
+    },
+    header
+  );
+  return response;
 };
 
-export const captureOrCancelPayment = async (customToken, action, transactionId) => {
-  try {
-    const res = await axios.post(
-      `https://${url}/api/Payment/v1/Transaction/${action}`,
-      {
-        RequestHeader: {
-          SpecVersion: '1.35',
-          RequestId: 'id',
-          CustomerId: customerId,
-          RetryIndicator: 0,
-        },
-        TransactionReference: {
-          TransactionId: transactionId,
-        },
+const capturePayment = async (transactionId) => {
+  const response = await axios.post(
+    `https://${url}/api/Payment/v1/Transaction/Capture`,
+    {
+      RequestHeader: {
+        SpecVersion: '1.35',
+        RequestId: 'id',
+        CustomerId: customerId,
+        RetryIndicator: 0,
       },
-      header
-    );
-    setStatusCache(customToken, { status: res.data.Status });
-    return res.data;
-  } catch (err) {
-    logger.error(JSON.stringify(err.response.data));
-    throw err;
-  }
+      TransactionReference: {
+        TransactionId: transactionId,
+      },
+    },
+    header
+  );
+  return response;
+};
+
+export default {
+  create: createPayment,
+  checkStatus: checkPaymentStatus,
+  capture: capturePayment,
 };

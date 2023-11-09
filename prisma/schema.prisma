@@ -3,7 +3,7 @@
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native"] // replace 1.x.x with the appropriate version
+  binaryTargets = ["native"]
 }
 
 datasource db {
@@ -61,19 +61,19 @@ model Week {
 }
 
 model Day {
-  id           Int    @id @default(autoincrement())
-  bookedWeekId Int
-  day          String
-  week         Week   @relation(fields: [bookedWeekId], references: [id])
+  id     Int    @id @default(autoincrement())
+  weekId Int
+  name   String
+  week   Week   @relation(fields: [weekId], references: [id])
 }
 
 model Tokens {
   id           Int      @id @default(autoincrement())
+  paymentId    String   @unique
   customToken  String   @unique
   paymentToken String   @unique
   createdAt    DateTime @default(now())
   expiresAt    DateTime
-  paymentId    String   @unique
   payment      Payment? @relation(fields: [paymentId], references: [id])
 }
 
@@ -86,9 +86,9 @@ enum TransactionStatus {
 model Payment {
   id                      String             @id @default(uuid())
   bookingId               String             @unique
-  amount                  Float
+  price                   Float
   currency                String             @default("CHF")
-  orderId                 String
+  orderId                 String             @unique
   transactionStatus       TransactionStatus?
   transactionType         String?
   transactionId           String?

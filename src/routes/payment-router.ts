@@ -1,14 +1,10 @@
 import { Router } from 'express';
-import { initializePayment, paymentFailure, paymentStatus, paymentSuccess } from '../handler/payment';
+import { initializePayment, paymentStatus } from '../handlers/payment';
 
 const router = Router();
 
-router.post('/initialize', initializePayment);
+router.post('/', initializePayment);
 
-router.get('/status/:token', paymentStatus);
-
-router.get('/success/:token', paymentSuccess);
-
-router.get('/failure/:token', paymentFailure);
+router.get('/', paymentStatus);
 
 export default router;
