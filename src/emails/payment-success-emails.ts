@@ -257,7 +257,7 @@ export const sendEmails = async (customToken) => {
 
   const mailOptionsOwner = {
     from: user,
-    to: 'contact@nbweb.solutions',
+    to: 'lea@vandermerwe.ch',
     subject: `Betreff: Van der Merwe Center - Anmeldung Kindercamp (${customer.firstName} ${customer.lastName})`,
     html: ownerContent,
   };
