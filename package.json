@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/NiBu94/rest-api#readme",
   "dependencies": {
-    "@prisma/client": "^5.4.2",
+    "@prisma/client": "^5.5.2",
     "axios": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -38,7 +38,7 @@
     "@types/lodash.merge": "^4.6.7",
     "@types/node": "^20.6.0",
     "@types/uuid": "^9.0.4",
-    "prisma": "^5.4.2",
+    "prisma": "^5.5.2",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }

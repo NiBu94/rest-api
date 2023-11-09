@@ -42,20 +42,20 @@ CREATE TABLE `Booking` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `BookedWeek` (
+CREATE TABLE `Week` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `bookingId` VARCHAR(191) NOT NULL,
-    `weekName` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
     `maxDays` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `BookedDays` (
+CREATE TABLE `Day` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `bookedWeekId` INTEGER NOT NULL,
-    `bookedDay` VARCHAR(191) NOT NULL,
+    `weekId` INTEGER NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -63,15 +63,15 @@ CREATE TABLE `BookedDays` (
 -- CreateTable
 CREATE TABLE `Tokens` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `paymentId` VARCHAR(191) NOT NULL,
     `customToken` VARCHAR(191) NOT NULL,
     `paymentToken` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `expiresAt` DATETIME(3) NOT NULL,
-    `paymentId` VARCHAR(191) NOT NULL,
 
+    UNIQUE INDEX `Tokens_paymentId_key`(`paymentId`),
     UNIQUE INDEX `Tokens_customToken_key`(`customToken`),
     UNIQUE INDEX `Tokens_paymentToken_key`(`paymentToken`),
-    UNIQUE INDEX `Tokens_paymentId_key`(`paymentId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -79,7 +79,7 @@ CREATE TABLE `Tokens` (
 CREATE TABLE `Payment` (
     `id` VARCHAR(191) NOT NULL,
     `bookingId` VARCHAR(191) NOT NULL,
-    `amount` DOUBLE NOT NULL,
+    `price` DOUBLE NOT NULL,
     `currency` VARCHAR(191) NOT NULL DEFAULT 'CHF',
     `orderId` VARCHAR(191) NOT NULL,
     `transactionStatus` ENUM('AUTHORIZED', 'CAPTURED', 'CANCELED') NULL,
@@ -96,6 +96,7 @@ CREATE TABLE `Payment` (
     `captureDate` DATETIME(3) NULL,
 
     UNIQUE INDEX `Payment_bookingId_key`(`bookingId`),
+    UNIQUE INDEX `Payment_orderId_key`(`orderId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -106,10 +107,10 @@ ALTER TABLE `Child` ADD CONSTRAINT `Child_customerId_fkey` FOREIGN KEY (`custome
 ALTER TABLE `Booking` ADD CONSTRAINT `Booking_customerId_fkey` FOREIGN KEY (`customerId`) REFERENCES `Customer`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `BookedWeek` ADD CONSTRAINT `BookedWeek_bookingId_fkey` FOREIGN KEY (`bookingId`) REFERENCES `Booking`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Week` ADD CONSTRAINT `Week_bookingId_fkey` FOREIGN KEY (`bookingId`) REFERENCES `Booking`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `BookedDays` ADD CONSTRAINT `BookedDays_bookedWeekId_fkey` FOREIGN KEY (`bookedWeekId`) REFERENCES `BookedWeek`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Day` ADD CONSTRAINT `Day_weekId_fkey` FOREIGN KEY (`weekId`) REFERENCES `Week`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Tokens` ADD CONSTRAINT `Tokens_paymentId_fkey` FOREIGN KEY (`paymentId`) REFERENCES `Payment`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
