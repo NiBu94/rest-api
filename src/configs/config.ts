@@ -18,12 +18,14 @@ export default merge(
     port: process.env.PORT,
     appURL: process.env.APP_URL,
     api: process.env.API,
+    notification: process.env.NOTIFICATION,
     secrets: {
       saferpay: {
         auth: process.env.SAFERPAY_AUTH,
         url: process.env.SAFERPAY_URL,
         terminalId: process.env.SAFERPAY_TERMINAL_ID,
         customerId: process.env.SAFERPAY_CUSTOMER_ID,
+        receiversForNotifications: process.env.SAFERPAY_NOTIFICATION,
       },
       smtp: {
         host: process.env.SMTP_HOST,

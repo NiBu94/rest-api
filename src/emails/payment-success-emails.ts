@@ -2,7 +2,6 @@
 import nodemailer from 'nodemailer';
 import config from '../configs/config';
 import db from '../db';
-import { logger } from '../configs/loggers';
 
 const { host, port, user, pass } = config.secrets.smtp;
 
@@ -61,7 +60,7 @@ export const sendEmails = async (customToken) => {
     }
   }
   let customerContent = `<p>Guten Tag ${customer.firstName} ${customer.lastName} </p>`;
-  customerContent += `<p>Wir bedanken uns für Ihr Interesse an den Multisport-Camps im Van der Merwe Center und bestätigen Ihnen die Anmeldung für ${firstChild.firstName} ${firstChild.lastName} für das folgende Camp:</p>`;
+  customerContent += `<p>Wir bedanken uns für Ihr Interesse an den Multisport-Camps im Van der Merwe Center und bestätigen Ihnen die Anmeldung für ${firstChild.firstName} ${firstChild.lastName} ${secondChild.firstName ? `und ${secondChild.firstName} ${secondChild.lastName} ` : ''}für das folgende Camp:</p>`;
   const weekMap = {
     carnivalFirstWeek: '1. Woche Fasnacht',
     carnivalSecondWeek: '2. Woche Fasnacht',
@@ -100,126 +99,125 @@ export const sendEmails = async (customToken) => {
   };
 
   const responseCustomer = await sendEmail(mailOptionsCustomer);
-  logger.info('E-Mail sent to customer:', responseCustomer);
 
   let ownerContent = `<table style="width: 100%; border-collapse: collapse;" border="0">
     <tbody>
     <tr>
-    <td style="width: 40%;"><strong>Kind</strong></td>
-    <td style="width: 60%;"></td>
+    <td style="width: 20%;"><strong>Kind</strong></td>
+    <td style="width: 80%;"></td>
     </tr>
     <tr>
-    <td style="width: 40%;">Vorname</td>
-    <td style="width: 60%;">${firstChild.firstName}</td>
+    <td style="width: 20%;">Vorname</td>
+    <td style="width: 80%;">${firstChild.firstName}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Nachname</td>
-    <td style="width: 60%;">${firstChild.lastName}</td>
+    <td style="width: 20%;">Nachname</td>
+    <td style="width: 80%;">${firstChild.lastName}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Geburtstag</td>
-    <td style="width: 60%;">${firstChild.birthday}</td>
+    <td style="width: 20%;">Geburtstag</td>
+    <td style="width: 80%;">${firstChild.birthday}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Geschlecht</td>
-    <td style="width: 60%;">${firstChild.gender}</td>
+    <td style="width: 20%;">Geschlecht</td>
+    <td style="width: 80%;">${firstChild.gender}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Alleine nach Hause</td>
-    <td style="width: 60%;">${firstChild.allowanceToGoHomeAlone ? 'Ja' : 'Nein'}</td>
+    <td style="width: 20%;">Alleine nach Hause</td>
+    <td style="width: 80%;">${firstChild.allowanceToGoHomeAlone ? 'Ja' : 'Nein'}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Allergien</td>
-    <td style="width: 60%;">${firstChild.allergies ? firstChild.allergies.replace(/\n/g, '<br>') : 'Keine'}</td>
+    <td style="width: 20%;">Allergien</td>
+    <td style="width: 80%;">${firstChild.allergies ? firstChild.allergies.replace(/\n/g, '<br>') : 'Keine'}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">&nbsp</td>
-    <td style="width: 60%;">&nbsp</td>
+    <td style="width: 20%;">&nbsp</td>
+    <td style="width: 80%;">&nbsp</td>
     </tr>`;
   if (secondChild.firstName) {
     ownerContent += `
       <tr>
-      <td style="width: 40%;"><strong>Geschwisterkind</strong></td>
-      <td style="width: 60%;"></td>
+      <td style="width: 20%;"><strong>Geschwisterkind</strong></td>
+      <td style="width: 80%;"></td>
       </tr>
       <tr>
-      <td style="width: 40%;">Vorname</td>
-      <td style="width: 60%;">${secondChild.firstName}</td>
+      <td style="width: 20%;">Vorname</td>
+      <td style="width: 80%;">${secondChild.firstName}</td>
       </tr>
       <tr>
-      <td style="width: 40%;">Nachname</td>
-      <td style="width: 60%;">${secondChild.lastName}</td>
+      <td style="width: 20%;">Nachname</td>
+      <td style="width: 80%;">${secondChild.lastName}</td>
       </tr>
       <tr>
-      <td style="width: 40%;">Geburtstag</td>
-      <td style="width: 60%;">${secondChild.birthday}</td>
+      <td style="width: 20%;">Geburtstag</td>
+      <td style="width: 80%;">${secondChild.birthday}</td>
       </tr>
       <tr>
-      <td style="width: 40%;">Geschlecht</td>
-      <td style="width: 60%;">${secondChild.gender}</td>
+      <td style="width: 20%;">Geschlecht</td>
+      <td style="width: 80%;">${secondChild.gender}</td>
       </tr>
       <tr>
-      <td style="width: 40%;">Alleine nach Hause</td>
-      <td style="width: 60%;">${secondChild.allowanceToGoHomeAlone ? 'Ja' : 'Nein'}</td>
+      <td style="width: 20%;">Alleine nach Hause</td>
+      <td style="width: 80%;">${secondChild.allowanceToGoHomeAlone ? 'Ja' : 'Nein'}</td>
       </tr>
       <tr>
-      <td style="width: 40%;">Allergien</td>
-      <td style="width: 60%;">${secondChild.allergies ? secondChild.allergies.replace(/\n/g, '<br>') : 'Keine'}</td>
+      <td style="width: 20%;">Allergien</td>
+      <td style="width: 80%;">${secondChild.allergies ? secondChild.allergies.replace(/\n/g, '<br>') : 'Keine'}</td>
       </tr>
       <tr>
-      <td style="width: 40%;">&nbsp</td>
-      <td style="width: 60%;">&nbsp</td>
+      <td style="width: 20%;">&nbsp</td>
+      <td style="width: 80%;">&nbsp</td>
       </tr>
       `;
   }
   ownerContent += `
     <tr>
-    <td style="width: 40%;"><strong>Kontaktperson</strong></td>
-    <td style="width: 60%;"></td>
+    <td style="width: 20%;"><strong>Kontaktperson</strong></td>
+    <td style="width: 80%;"></td>
     </tr>
     <tr>
-    <td style="width: 40%;">Vorname</td>
-    <td style="width: 60%;">${customer.firstName}</td>
+    <td style="width: 20%;">Vorname</td>
+    <td style="width: 80%;">${customer.firstName}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Nachname</td>
-    <td style="width: 60%;">${customer.lastName}</td>
+    <td style="width: 20%;">Nachname</td>
+    <td style="width: 80%;">${customer.lastName}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Straße</td>
-    <td style="width: 60%;">${customer.street}</td>
+    <td style="width: 20%;">Straße</td>
+    <td style="width: 80%;">${customer.street}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Hausnummer</td>
-    <td style="width: 60%;">${customer.streetNumber}</td>
+    <td style="width: 20%;">Hausnummer</td>
+    <td style="width: 80%;">${customer.streetNumber}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Postleitzahl</td>
-    <td style="width: 60%;">${customer.zipCode}</td>
+    <td style="width: 20%;">Postleitzahl</td>
+    <td style="width: 80%;">${customer.zipCode}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Ort</td>
-    <td style="width: 60%;">${customer.city}</td>
+    <td style="width: 20%;">Ort</td>
+    <td style="width: 80%;">${customer.city}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Email</td>
-    <td style="width: 60%;">${customer.email}</td>
+    <td style="width: 20%;">Email</td>
+    <td style="width: 80%;">${customer.email}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Telefon_1</td>
-    <td style="width: 60%;">${customer.firstPhoneNumber}</td>
+    <td style="width: 20%;">Telefon_1</td>
+    <td style="width: 80%;">${customer.firstPhoneNumber}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Telefon_2</td>
-    <td style="width: 60%;">${customer.secondPhoneNumber ? customer.secondPhoneNumber : 'Keine'}</td>
+    <td style="width: 20%;">Telefon_2</td>
+    <td style="width: 80%;">${customer.secondPhoneNumber ? customer.secondPhoneNumber : 'Keine'}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">&nbsp</td>
-    <td style="width: 60%;">&nbsp</td>
+    <td style="width: 20%;">&nbsp</td>
+    <td style="width: 80%;">&nbsp</td>
     </tr>
     <tr>
-    <td style="width: 40%;"><strong>Campdetails</strong></td>
-    <td style="width: 60%;"></td>
+    <td style="width: 20%;"><strong>Campdetails</strong></td>
+    <td style="width: 80%;"></td>
     </tr>
     `;
 
@@ -227,44 +225,40 @@ export const sendEmails = async (customToken) => {
     const daysString = week.days.map((day) => day.name).join(', ');
     ownerContent += `
       <tr>
-      <td style="width: 40%;">Woche</td>
-      <td style="width: 60%;">${weekMap[week.name]}</td>
+      <td style="width: 20%;">Woche</td>
+      <td style="width: 80%;">${weekMap[week.name]}</td>
       </tr>
       <tr>
-      <td style="width: 40%;">Tage</td>
-      <td style="width: 60%;">${daysString}</td>
+      <td style="width: 20%;">Tage</td>
+      <td style="width: 80%;">${daysString}</td>
       </tr>`;
   }
   ownerContent += `
     <tr>
-    <td style="width: 40%;">Preis</td>
-    <td style="width: 60%;">${price}</td>
+    <td style="width: 20%;">Preis</td>
+    <td style="width: 80%;">${price}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Bezahlt</td>
-    <td style="width: 60%;">Ja</td>
+    <td style="width: 20%;">Bezahlt</td>
+    <td style="width: 80%;">Ja</td>
     </tr>
     <tr>
-    <td style="width: 40%;">Nachricht</td>
-    <td style="width: 60%;">${customer.optionalMessage ? customer.optionalMessage.replace(/\n/g, '<br>') : 'Keine'}</td>
+    <td style="width: 20%;">Nachricht</td>
+    <td style="width: 80%;">${customer.optionalMessage ? customer.optionalMessage.replace(/\n/g, '<br>') : 'Keine'}</td>
     </tr>
     <tr>
-    <td style="width: 40%;">AGB Akzeptiert</td>
-    <td style="width: 60%;">Ja</td>
+    <td style="width: 20%;">AGB Akzeptiert</td>
+    <td style="width: 80%;">Ja</td>
     </tr>
     </tbody>
     `;
 
   const mailOptionsOwner = {
     from: user,
-    to: 'lea@vandermerwe.ch',
+    to: config.notification,
     subject: `Betreff: Van der Merwe Center - Anmeldung Kindercamp (${customer.firstName} ${customer.lastName})`,
     html: ownerContent,
   };
 
-  const responseOwner = await sendEmail(mailOptionsOwner);
-  logger.info('E-Mail sent to owner:', responseOwner);
-
-  // For some reason, winston logger cant log response?
-  // logger.info('Email sent to customer:', response.accepted);
+  await sendEmail(mailOptionsOwner);
 };

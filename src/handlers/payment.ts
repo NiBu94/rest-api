@@ -64,7 +64,6 @@ export const initializePayment = async (req, res, next) => {
 
     res.status(201).json({ redirectURL: response.data.RedirectUrl });
   } catch (err) {
-    // logger.error(err.message);
     next(err);
   }
 };

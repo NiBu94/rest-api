@@ -16,7 +16,7 @@ if (config.env === 'local') {
   app.use(morganFile);
 }
 
-app.use('/api/payment', router);
+app.use(`/${config.api}/payment`, router);
 
 app.use((err, req, res, next) => {
   logger.error(err.stack);

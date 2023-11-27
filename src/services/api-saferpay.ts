@@ -34,7 +34,7 @@ const createPayment = async (price, customToken, orderId, customerEmail) => {
     },
 
     Notification: {
-      MerchantEmails: ['lea@vandermerwe.ch', 'contact@nbweb.solutions'],
+      MerchantEmails: config.secrets.saferpay.receiversForNotifications.split(','),
       PayerEmail: customerEmail,
       SuccessNotifyUrl: `https://${config.appURL}/${config.api}/payment?customToken=${customToken}`,
       FailNotifyUrl: `https://${config.appURL}/${config.api}/payment?customToken=${customToken}`,
