@@ -34,7 +34,7 @@ const createPayment = async (price, customToken, orderId, customerEmail) => {
     },
 
     Notification: {
-      MerchantEmails: config.secrets.saferpay.receiversForNotifications.split(','),
+      MerchantEmails: config.notification.split(','),
       PayerEmail: customerEmail,
       SuccessNotifyUrl: `https://${config.appURL}/${config.api}/payment?customToken=${customToken}`,
       FailNotifyUrl: `https://${config.appURL}/${config.api}/payment?customToken=${customToken}`,
