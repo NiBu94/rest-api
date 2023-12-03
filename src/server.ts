@@ -4,9 +4,22 @@ import morgan from 'morgan';
 import { logger, morganFile } from './configs/loggers';
 import router from './routes/payment-router';
 import config from './configs/config';
+import { createNewUser, signIn } from './user';
+import basicAuth from './middleware/basic-auth';
+import path from 'path';
 
 const app = express();
 
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || origin === 'http://localhost') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -17,6 +30,17 @@ if (config.env === 'local') {
 }
 
 app.use(`/${config.api}/payment`, router);
+
+app.post('/api/user', basicAuth, createNewUser);
+app.post('/api/sign-in', signIn);
+app.get('/form', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'form.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
 
 app.use((err, req, res, next) => {
   logger.error(err.stack);

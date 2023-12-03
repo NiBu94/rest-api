@@ -33,6 +33,9 @@ export default merge(
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      jwt: process.env.JWT_SECRET,
+      user: process.env.USER,
+      pass: process.env.PASS,
     },
     logging: {
       console: true,

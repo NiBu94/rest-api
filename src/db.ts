@@ -102,6 +102,22 @@ const getDataForEmails = async (customToken) => {
   });
 };
 
+const createUser = async (data) => {
+  const user = await prisma.user.create({
+    data,
+  });
+  return user;
+};
+
+const getUser = async (username) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      username,
+    },
+  });
+  return user;
+};
+
 export default {
   customer: {
     create: createCustomer,
@@ -122,5 +138,9 @@ export default {
   },
   email: {
     getData: getDataForEmails,
+  },
+  user: {
+    create: createUser,
+    read: getUser,
   },
 };
