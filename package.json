@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "migrate": "npx prisma migrate dev --name init",
-    "deploy": "npx prisma migrate deploy"
+    "deploy": "npx prisma migrate deploy",
+    "tailwind": "npx tailwindcss -i ./src/public/input.css -o ./src/public/styles.css --watch"
   },
   "repository": {
     "type": "git",

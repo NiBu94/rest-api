@@ -7,6 +7,7 @@ import config from './configs/config';
 import { createNewUser, signIn } from './user';
 import basicAuth from './middleware/basic-auth';
 import path from 'path';
+import { protect } from './auth';
 
 const app = express();
 
@@ -33,12 +34,12 @@ app.use(`/${config.api}/payment`, router);
 
 app.post('/api/user', basicAuth, createNewUser);
 app.post('/api/sign-in', signIn);
-app.get('/form', (req, res) => {
+app.get('/form', /*protect,*/ (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'form.html'));
 });
 
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'login', 'login.html'));
 });
 
 
