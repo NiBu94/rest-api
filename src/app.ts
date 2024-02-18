@@ -1,8 +1,31 @@
+import express from 'express';
+import cors from 'cors';
+import paymentRouter from './routes/payment';
 import config from './configs/config';
-import app from './server';
-import { logger } from './configs/loggers';
+import morgan from './middleware/morgan';
+import { v4 as uuidv4 } from 'uuid';
 
-app.listen(config.port, () => {
-  logger.info(`running on http://localhost:${config.port}`);
-  logger.info(`environment: ${config.env}`);
+const app = express();
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || origin === 'http://localhost') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  req.id = uuidv4();
+  next();
 });
+app.use(morgan);
+
+app.use(`/${config.api}/payment`, paymentRouter);
+
+export default app;

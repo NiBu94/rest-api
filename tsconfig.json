@@ -5,6 +5,6 @@
       "strict": false,
       "noImplicitAny": false,
       "lib": ["esnext"],
-      "esModuleInterop": true
+      "esModuleInterop": true,
     }
   }

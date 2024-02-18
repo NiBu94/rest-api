@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <title>Customer notification on payment success</title>
+  </head>
+  <body>
+    <p>Guten Tag {{customer.firstName}} {{customer.lastName}} </p>
+    <p>Wir bedanken uns für Ihr Interesse an den Multisport-Camps im Van der Merwe Center und bestätigen Ihnen die Anmeldung für
+      {{firstChild.firstName}}
+      {{firstChild.lastName}}{{secondChild.fullName}}
+      für das folgende Camp:</p>
+    <p>
+      {{#each weeks}}
+        {{this}}{{#unless @last}}<br />{{/unless}}
+      {{/each}}
+    </p>
+    <p>Das Camp kostet CHF {{price}}</p>
+    <p><strong>Allgemeine Informationen für Camp-Teilnehmer:</strong></p>
+    <p>Treffpunkt ist täglich um 10:00 Uhr im Eingangsbereich des Van der Merwe Centers.</p>
+    <p>Die Camp-Teilnehmer sollten Sportkleidung und Sportschuhe anziehen und eine Trinkflasche mitnehmen. An kühlen Tagen empfehlen wir zusätzlich
+      zur Sportkleidung auch einen Pullover/Trainingsjacke mitzubringen. Im Sommer sollten die Kinder einen Hut mitbringen und sich zu Hause
+      eincremen.</p>
+    <p>Wir freuen uns auf das Camp!<br />Ihr Multisport-Camp Team</p>
+  </body>
+</html>

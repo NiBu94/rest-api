@@ -1,111 +1,99 @@
-//@ts-nocheck
 import crypto from 'crypto';
-import { v4 as uuidv4 } from 'uuid';
-import saferpay from '../services/api-saferpay';
-import db from '../db';
-import { sendEmails } from '../emails/payment-success-emails';
+import db from '../services/db/dbService';
+import config from '../configs/config';
+import paymentService from '../services/payment/paymentService';
+import emailService from '../services/email/emailService';
+import { calculatePrice } from '../modules/priceCalculator';
+import { AxiosError } from 'axios';
+import logger from '../configs/logger';
 
-export const initializePayment = async (req, res, next) => {
+const createPayment = async (req, res) => {
   try {
-    const { bookedWeeks, firstChild, secondChild, customer } = req.body;
-    const priceMap = {
-      5: { 1: 75, 2: 150, 3: 225, 4: 290, 5: 290 },
-      4: { 1: 75, 2: 150, 3: 225, 4: 240 },
-      3: { 1: 75, 2: 150, 3: 180 },
-    };
-    const customerId = await db.customer.create(customer);
-    firstChild.customerId = customerId;
-    const children = [firstChild];
-    if (secondChild.firstName) {
-      secondChild.customerId = customerId;
-      children.push(secondChild);
-    }
-    await db.child.createMany(children);
+    const customer = await db.customer.create(req.body.customer);
+    await db.child.createMany(req.body.firstChild, req.body.secondChild, customer.id);
+    const booking = await db.booking.create(customer.id);
 
-    const booking = {
-      customerId,
-      weeks: {
-        create: [],
-      },
-    };
     let price = 0;
-    for (const week of bookedWeeks) {
-      price += priceMap[week.maxDays][week.bookedDays.length] * children.length;
-      if (week.bookedDays.length === week.maxDays && secondChild.firstName) {
-        price -= 20;
-      }
-      booking.weeks.create.push({
-        name: week.name,
-        maxDays: week.maxDays,
-        days: {
-          create: week.bookedDays.map((day) => ({
-            name: day,
-          })),
-        },
-      });
+    for (const bookedWeek of req.body.bookedWeeks) {
+      const week = await db.week.create(booking.id, bookedWeek.name, bookedWeek.maxDays);
+      await db.day.createMany(week.id, bookedWeek.bookedDays);
+      price += calculatePrice(bookedWeek, req.body.secondChild);
     }
 
-    const bookingId = await db.booking.create(booking);
     const customToken = crypto.randomBytes(16).toString('hex');
-    const orderId = uuidv4();
-    const response = await saferpay.create(price * 100, customToken, orderId, customer.email);
-    await db.payment.create({
-      bookingId,
-      price,
-      orderId,
-      tokens: {
-        create: {
-          customToken,
-          paymentToken: response.data.Token,
-          expiresAt: response.data.Expiration,
-        },
-      },
-    });
-
+    const response = await paymentService.create(req.id, price, customToken, booking.id, req.body.customer.email);
+    if (config.env === 'local') logger.info(JSON.stringify(response.data.RedirectUrl));
+    const payment = await db.payment.create(booking.id, price);
+    await db.tokens.create(payment.id, customToken, response.data.Token, response.data.Expiration);
     res.status(201).json({ redirectURL: response.data.RedirectUrl });
   } catch (err) {
-    next(err);
+    logger.error(err);
+    if (err instanceof AxiosError) {
+      logger.error(JSON.stringify(err.response.data));
+    }
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-export const paymentStatus = async (req, res, next) => {
+const finalizePayment = async (req, res) => {
   try {
-    const { customToken } = req.query;
-    const token = await db.token.read(customToken);
-    let { transactionStatus } = await db.payment.read(token.paymentId);
+    const tokens = await db.tokens.get(req.query.customToken);
+    const payment = await db.payment.get(tokens.paymentId);
     let responseCheckStatus;
-    if (!transactionStatus) {
-      responseCheckStatus = await saferpay.checkStatus(token.paymentToken);
-      transactionStatus = responseCheckStatus.data.Transaction.Status;
+    if (!payment.transactionStatus) {
+      responseCheckStatus = await paymentService.getStatus(req.id, tokens.paymentToken);
+      payment.transactionStatus = responseCheckStatus.data.Transaction.Status;
     }
 
-    switch (transactionStatus) {
+    switch (payment.transactionStatus) {
       case 'AUTHORIZED':
-        const responseCapturePayment = await saferpay.capture(responseCheckStatus.data.Transaction.Id);
-        await db.payment.update(token.paymentId, {
-          transactionType: responseCheckStatus.data.Transaction.Type,
-          transactionId: responseCheckStatus.data.Transaction.Id,
-          transactionDate: responseCheckStatus.data.Transaction.Date,
-          acquirerName: responseCheckStatus.data.Transaction.AcquirerName,
-          acquirerReference: responseCheckStatus.data.Transaction.AcquirerReference,
-          sixTransactionReference: responseCheckStatus.data.Transaction.SixTransactionReference,
-          approvalCode: responseCheckStatus.data.Transaction.ApprovalCode,
-          liabilityShift: responseCheckStatus.data.Liability.LiabilityShift,
-          liableEntity: responseCheckStatus.data.Liability.LiableEntity,
-          transactionStatus: responseCapturePayment.data.Status,
-          captureId: responseCapturePayment.data.CaptureId,
-          captureDate: responseCapturePayment.data.Date,
-        });
-
-        await sendEmails(customToken);
+        const responseCapturePayment = await paymentService.finalize(req.id, responseCheckStatus.data.Transaction.Id);
+        await db.payment.update(tokens.paymentId, responseCheckStatus, responseCapturePayment);
+        const customer = await db.booking.getCustomer(payment.bookingId);
+        const children = await db.child.getMany(customer.id);
+        const weeks = await db.week.getManyWithDays(payment.bookingId);
+        await emailService.sendPaymentSuccessToCustomer(customer, children, weeks, payment.price);
+        await emailService.sendPaymentSuccessToOwner(customer, children, weeks, payment.price);
       case 'CAPTURED':
-        res.status(200).json({ message: 'Danke für Ihre Bezahlung. Sie erhalten in kürze eine Bestätigungs E-Mail.' });
+        res.status(200).json({ message: 'Danke für Ihre Bezahlung. Sie erhalten in kürze zwei Bestätigungs-E-Mails.' });
         break;
       case 'CANCELED':
         res.status(200).json({ message: 'Die Zahlung wurde durch Sie abgebrochen.' });
         break;
     }
   } catch (err) {
-    next(err);
+    if (err instanceof AxiosError) {
+      if (err.response?.data?.ErrorName === 'TRANSACTION_ABORTED') {
+        try {
+          const paymentId = await db.tokens.getPaymentId(req.query.customToken);
+          await db.payment.updateOnFailure(paymentId, 'CANCELED');
+        } catch (err) {
+          logger.error(`Failed updating canceled payment: ${req.query.customToken}`, err);
+        }
+        res.status(200).json({ message: 'Die Zahlung wurde durch Sie abgebrochen.' });
+      } else {
+        logger.error(JSON.stringify(err.response.data));
+      }
+    } else {
+      logger.error(err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
   }
+};
+
+const paymentFailed = async (req, res) => {
+  try {
+    const paymentId = await db.tokens.getPaymentId(req.query.customToken);
+    await db.payment.updateOnFailure(paymentId, 'CANCELED');
+    res.status(200).end();
+  } catch (err) {
+    logger.error(`Failed updating canceled payment: ${req.query.customToken}`);
+    res.status(200).end();
+  }
+};
+
+export default {
+  createPayment,
+  finalizePayment,
+  paymentFailed,
 };

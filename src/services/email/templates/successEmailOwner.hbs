@@ -1,0 +1,151 @@
+<html>
+  <head>
+    <title>Owner notification on payment success</title>
+  </head>
+  <body>
+    <table style='width: 100%; border-collapse: collapse; height: 666px;' border='0'>
+      <tbody>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'><strong>Kind</strong></td>
+          <td style='width: 80%; height: 18px;'>&nbsp;</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Vorname</td>
+          <td style='width: 80%; height: 18px;'>{{firstChild.firstName}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Nachname</td>
+          <td style='width: 80%; height: 18px;'>{{firstChild.lastName}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Geburtstag</td>
+          <td style='width: 80%; height: 18px;'>{{firstChild.birthday}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Geschlecht</td>
+          <td style='width: 80%; height: 18px;'>{{firstChild.gender}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Alleine nach Hause</td>
+          <td style='width: 80%; height: 18px;'>{{firstChild.allowanceToGoHomeAlone}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Allergien</td>
+          <td style='width: 80%; height: 18px;'>{{{firstChild.allergies}}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>&nbsp;</td>
+          <td style='width: 80%; height: 18px;'>&nbsp;</td>
+        </tr>
+        {{#if secondChild.firstName}}
+          <tr style='height: 18px;'>
+            <td style='width: 20%; height: 18px;'><strong>Geschwisterkind</strong></td>
+            <td style='width: 80%; height: 18px;'>&nbsp;</td>
+          </tr>
+          <tr style='height: 18px;'>
+            <td style='width: 20%; height: 18px;'>Vorname</td>
+            <td style='width: 80%; height: 18px;'>{{secondChild.firstName}}</td>
+          </tr>
+          <tr style='height: 18px;'>
+            <td style='width: 20%; height: 18px;'>Nachname</td>
+            <td style='width: 80%; height: 18px;'>{{secondChild.lastName}}</td>
+          </tr>
+          <tr style='height: 18px;'>
+            <td style='width: 20%; height: 18px;'>Geburtstag</td>
+            <td style='width: 80%; height: 18px;'>{{secondChild.birthday}}</td>
+          </tr>
+          <tr style='height: 18px;'>
+            <td style='width: 20%; height: 18px;'>Geschlecht</td>
+            <td style='width: 80%; height: 18px;'>{{secondChild.gender}}</td>
+          </tr>
+          <tr style='height: 18px;'>
+            <td style='width: 20%; height: 18px;'>Alleine nach Hause</td>
+            <td style='width: 80%; height: 18px;'>{{secondChild.allowanceToGoHomeAlone}}</td>
+          </tr>
+          <tr style='height: 18px;'>
+            <td style='width: 20%; height: 18px;'>Allergien</td>
+            <td style='width: 80%; height: 18px;'>{{{secondChild.allergies}}}</td>
+          </tr>
+          <tr style='height: 18px;'>
+            <td style='width: 20%; height: 18px;'>&nbsp;</td>
+            <td style='width: 80%; height: 18px;'>&nbsp;</td>
+          </tr>
+        {{/if}}
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'><strong>Kontaktperson</strong></td>
+          <td style='width: 80%; height: 18px;'>&nbsp;</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Vorname</td>
+          <td style='width: 80%; height: 18px;'>{{customer.firstName}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Nachname</td>
+          <td style='width: 80%; height: 18px;'>{{customer.lastName}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Straße</td>
+          <td style='width: 80%; height: 18px;'>{{customer.street}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Hausnummer</td>
+          <td style='width: 80%; height: 18px;'>{{customer.streetNumber}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Postleitzahl</td>
+          <td style='width: 80%; height: 18px;'>{{customer.zipCode}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Ort</td>
+          <td style='width: 80%; height: 18px;'>{{customer.city}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Email</td>
+          <td style='width: 80%; height: 18px;'>{{customer.email}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Telefon_1</td>
+          <td style='width: 80%; height: 18px;'>{{customer.firstPhoneNumber}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Telefon_2</td>
+          <td style='width: 80%; height: 18px;'>{{customer.secondPhoneNumber}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>&nbsp;</td>
+          <td style='width: 80%; height: 18px;'>&nbsp;</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'><strong>Campdetails</strong></td>
+          <td style='width: 80%; height: 18px;'>&nbsp;</td>
+        </tr>
+        {{#each week}}
+          <tr style='height: 18px;'>
+            <td style='width: 20%; height: 18px;'>Woche</td>
+            <td style='width: 80%; height: 18px;'>{{@key}}</td>
+          </tr>
+          <tr style='height: 18px;'>
+            <td style='width: 20%; height: 18px;'>Tage</td>
+            <td style='width: 80%; height: 18px;'>{{this}}</td>
+          </tr>
+        {{/each}}
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Preis</td>
+          <td style='width: 80%; height: 18px;'>{{price}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Bezahlt</td>
+          <td style='width: 80%; height: 18px;'>Ja</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>Nachricht</td>
+          <td style='width: 80%; height: 18px;'>{{{customer.optionalMessage}}}</td>
+        </tr>
+        <tr style='height: 18px;'>
+          <td style='width: 20%; height: 18px;'>AGB Akzeptiert</td>
+          <td style='width: 80%; height: 18px;'>Ja</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

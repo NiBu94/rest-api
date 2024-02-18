@@ -1,46 +1,26 @@
+import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
 dotenv.config();
-import merge from 'lodash.merge';
 
-const env = process.env.NODE_ENV;
+const prisma = new PrismaClient();
 
-let envConfig;
-
-if (env === 'production') {
-  envConfig = require('./prod').default;
-} else {
-  envConfig = require('./dev').default;
-}
-
-export default merge(
-  {
-    env,
-    port: process.env.PORT,
-    appURL: process.env.APP_URL,
-    api: process.env.API,
-    notification: process.env.NOTIFICATION,
-    secrets: {
-      saferpay: {
-        auth: process.env.SAFERPAY_AUTH,
-        url: process.env.SAFERPAY_URL,
-        terminalId: process.env.SAFERPAY_TERMINAL_ID,
-        customerId: process.env.SAFERPAY_CUSTOMER_ID,
-        receiversForNotifications: process.env.SAFERPAY_NOTIFICATION,
-      },
-      smtp: {
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      jwt: process.env.JWT_SECRET,
-      user: process.env.USER,
-      pass: process.env.PASS,
+export default {
+  env: process.env.NODE_ENV,
+  prisma,
+  port: process.env.PORT,
+  api: process.env.API,
+    saferpay: {
+      auth: process.env.SAFERPAY_AUTH,
+      url: process.env.SAFERPAY_URL,
+      terminalId: process.env.SAFERPAY_TERMINAL_ID,
+      customerId: process.env.SAFERPAY_CUSTOMER_ID,
+      receiverForNotification: process.env.SAFERPAY_NOTIFICATION,
+      notifyUrl: process.env.SAFERPAY_NOTIFY_URL
     },
-    logging: {
-      console: true,
-      file: false,
+    smtp: {
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
-  },
-  envConfig
-);
+};
