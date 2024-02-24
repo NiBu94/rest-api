@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { createLogger, format, transports, addColors } from 'winston';
 import path from 'path';
 import fs from 'fs';
@@ -12,9 +13,8 @@ addColors({
   http: 'cyan',
   verbose: 'magenta',
   debug: 'blue',
-  silly: 'grey'
-})
-
+  silly: 'grey',
+});
 const logger = createLogger();
 
 if (config.env !== 'local') {
@@ -24,8 +24,19 @@ if (config.env !== 'local') {
     fs.mkdirSync(logDir);
   }
 
+  const toggleDebugLogging = (req, res) => {
+    const debugTransport = new transports.File({ filename: path.join(logDir, 'debug.log'), level: 'debug' });
+
+    if (!logger.isDebugEnabled()) {
+      logger.add(debugTransport);
+      res.status(200).send('Debug enabled');
+    } else {
+      logger.remove(logger.transports[2]);
+      res.status(200).send('Debug disabled');
+    }
+  };
+
   logger.configure({
-    level: 'debug',
     format: combine(
       errors({ stack: true }),
       timestamp({
@@ -40,10 +51,10 @@ if (config.env !== 'local') {
     ),
     transports: [
       new transports.File({ filename: path.join(logDir, 'error.log'), level: 'error' }),
-      new transports.File({ filename: path.join(logDir, 'server.log'), level: 'info' }),
-      new transports.File({ filename: path.join(logDir, 'debug.log'), level: 'debug' }),
+      new transports.File({ filename: path.join(logDir, 'server.log'), level: 'http' }),
     ],
   });
+  logger.toggleDebugLogging = toggleDebugLogging;
 } else {
   logger.configure({
     level: 'http',

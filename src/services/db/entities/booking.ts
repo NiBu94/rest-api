@@ -5,7 +5,7 @@ const { prisma } = config;
 
 const create = async (customerId) => {
   logger.debug(`Creating booking with data: ${customerId}`);
-  return await prisma.booking.create({
+  return prisma.booking.create({
     data: {
       customerId,
     },

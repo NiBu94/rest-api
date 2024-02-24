@@ -5,7 +5,7 @@ const { prisma } = config;
 
 const create = async (bookingId, name, maxDays) => {
   logger.debug(`Creating week with data: ${bookingId} ${name} ${maxDays}`);
-  return await prisma.week.create({
+  return prisma.week.create({
     data: {
       bookingId,
       name,
@@ -19,7 +19,7 @@ const create = async (bookingId, name, maxDays) => {
 
 const getManyWithDays = async (bookingId) => {
   logger.debug(`Fetching weeks and days with data: ${bookingId}`);
-  return await prisma.week.findMany({
+  return prisma.week.findMany({
     where: {
       bookingId,
     },

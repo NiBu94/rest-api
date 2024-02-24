@@ -31,7 +31,7 @@ const get = async (paymentId) => {
 };
 
 const update = async (paymentId, responseCheckStatus, responseCapturePayment) => {
-  logger.debug(`Updating payment with data: ${paymentId}\n${JSON.stringify(responseCheckStatus)}\n${JSON.stringify(responseCapturePayment)}`);
+  logger.debug(`Updating payment with data: ${paymentId}\n${JSON.stringify(responseCheckStatus.data)}\n${JSON.stringify(responseCapturePayment.data)}`);
   const { Transaction, Liability } = responseCheckStatus.data;
   const { Status, CaptureId, Date } = responseCapturePayment.data;
 

@@ -5,7 +5,7 @@ const { prisma } = config;
 
 const createMany = async (weekId, days) => {
   logger.debug(`Creating week with data: ${weekId} ${days}`);
-  await prisma.day.createMany({
+  prisma.day.createMany({
     data: days.map((day) => ({
       weekId,
       name: day,

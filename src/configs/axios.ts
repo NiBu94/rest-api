@@ -26,12 +26,12 @@ httpClientPaymentService.interceptors.response.use(
     const hrDuration = process.hrtime(hrStartTime);
     const durationInMilliseconds = (hrDuration[0] * 1000 + hrDuration[1] / 1e6).toFixed(3);
 
-    const consoleFormat = `[OUT] ${method.toUpperCase()} ${url} ${colorStatus(response.status)}${response.status}\x1b[0m ${durationInMilliseconds}ms - ${
+    const consoleFormat = `[OUT] ${method.toUpperCase()} ${url} ${colorStatus(response.status)}${response.status}\x1b[0m ${durationInMilliseconds} ms - ${
       response.headers['content-length']
     }`;
-    const fileFormat = `${createGermanDateTime()} HTTP: [OUT] [${response.data.ResponseHeader.RequestId}] ${method.toUpperCase()} ${url} ${
+    const fileFormat = `[OUT] [${response.data.ResponseHeader.RequestId}] ${method.toUpperCase()} ${url} ${
       response.status
-    } ${durationInMilliseconds}ms ${response.headers['content-length']}`;
+    } ${durationInMilliseconds} ms ${response.headers['content-length']}`;
     logger.http(config.env === 'local' ? consoleFormat : fileFormat);
 
     return response;
@@ -42,12 +42,12 @@ httpClientPaymentService.interceptors.response.use(
       const hrDuration = process.hrtime(hrStartTime);
       const durationInMilliseconds = (hrDuration[0] * 1000 + hrDuration[1] / 1e6).toFixed(3);
 
-      const consoleFormat = `[OUT] ${method.toUpperCase()} ${url} ${colorStatus(error.response.status)}${error.response.status}\x1b[0m ${durationInMilliseconds}ms - ${
+      const consoleFormat = `[OUT] ${method.toUpperCase()} ${url} ${colorStatus(error.response.status)}${error.response.status}\x1b[0m ${durationInMilliseconds} ms - ${
         error.response.headers['content-length']
       }`;
-      const fileFormat = `${createGermanDateTime()} HTTP: [OUT] ${method.toUpperCase()} ${url} ${
+      const fileFormat = `[OUT] ${method.toUpperCase()} ${url} ${
         error.response.status
-      } ${durationInMilliseconds}ms ${error.response.headers['content-length']}`;
+      } ${durationInMilliseconds} ms ${error.response.headers['content-length']}`;
       logger.http(config.env === 'local' ? consoleFormat : fileFormat);
     } else if (error.request) {
       // The request was made but no response was received
