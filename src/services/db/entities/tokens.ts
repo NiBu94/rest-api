@@ -5,7 +5,7 @@ const { prisma } = config;
 
 const create = async (paymentId, customToken, paymentToken, expirationDate) => {
   logger.debug(`Creating tokens with data: ${paymentId} ${customToken} ${paymentToken} ${expirationDate}`);
-  prisma.tokens.create({
+  const result = await prisma.tokens.create({
     data: {
       paymentId,
       customToken,
@@ -13,6 +13,7 @@ const create = async (paymentId, customToken, paymentToken, expirationDate) => {
       expiresAt: expirationDate,
     },
   });
+  logger.debug(JSON.stringify(result));
 };
 
 const get = async (customToken) => {

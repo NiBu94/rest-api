@@ -30,6 +30,8 @@ app.use((req, res, next) => {
 app.use(morgan);
 
 app.use(`/${config.api}/payment`, paymentRouter);
-app.get('/admin/toggle-debug-logging', basicAuth, logger.toggleDebugLogging);
+if (config.env !== 'local') {
+  app.get('/admin/toggle-debug-logging', basicAuth, logger.toggleDebugLogging);
+}
 
 export default app;
