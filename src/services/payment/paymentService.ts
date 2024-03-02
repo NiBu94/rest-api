@@ -44,7 +44,7 @@ const createPayment = async (requestId, price, customToken, bookingId, customerE
     },
   };
   logger.debug(`Calling payment API to create a payment with the following data: ${JSON.stringify(data)}`);
-  return http.post('/PaymentPage/Initialize', data);
+  return await http.post('/PaymentPage/Initialize', data);
 };
 
 const checkPaymentStatus = async (requestId, paymentToken) => {
@@ -56,7 +56,7 @@ const checkPaymentStatus = async (requestId, paymentToken) => {
     Token: paymentToken,
   };
   logger.debug(`Calling payment API to check the payment status with the following data: ${JSON.stringify(data)}`);
-  return http.post(`/PaymentPage/Assert`, data);
+  return await http.post(`/PaymentPage/Assert`, data);
 };
 
 const capturePayment = async (requestId, transactionId) => {
@@ -70,7 +70,7 @@ const capturePayment = async (requestId, transactionId) => {
     },
   };
   logger.debug(`Calling payment API to capture the payment with the following data: ${JSON.stringify(data)}`);
-  return http.post('/Transaction/Capture', data);
+  return await http.post('/Transaction/Capture', data);
 };
 
 export default {

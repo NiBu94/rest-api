@@ -18,7 +18,7 @@ const create = async (paymentId, customToken, paymentToken, expirationDate) => {
 
 const get = async (customToken) => {
   logger.debug(`Fetching tokens with data: ${customToken}`);
-  return prisma.tokens.findUnique({
+  return await prisma.tokens.findUnique({
     where: {
       customToken,
     },

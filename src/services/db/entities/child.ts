@@ -12,12 +12,12 @@ const createMany = async (firstChild, secondChild, customerId) => {
     secondChild.customerId = customerId;
     children.push(secondChild);
   }
-  prisma.child.createMany({ data: children });
+  await prisma.child.createMany({ data: children });
 };
 
 const getMany = async (customerId) => {
   logger.debug(`Fetching children with data: ${customerId}`);
-  return prisma.child.findMany({
+  return await prisma.child.findMany({
     where: {
       customerId,
     },
