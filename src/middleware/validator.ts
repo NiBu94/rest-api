@@ -47,7 +47,7 @@ const validatePayload = [
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       logger.warn(`Validation errors: ${JSON.stringify(errors.array())}`);
-      return res.status(422).end();
+      return res.sendStatus(422).end();
     }
     next();
   },

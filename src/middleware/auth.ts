@@ -4,7 +4,7 @@ const basicAuth = (req, res, next) => {
   const authHeader = req.headers['authorization'];
 
   if (!authHeader) {
-    return res.status(401).send('Access Denied. No credentials sent!');
+    return res.sendStatus(401).send('Access Denied. No credentials sent!');
   }
 
   const base64Credentials = authHeader.split(' ')[1];
@@ -14,7 +14,7 @@ const basicAuth = (req, res, next) => {
   if (username === config.debug.user && password === config.debug.pass) {
     next();
   } else {
-    return res.status(401).send('Access Denied. Incorrect credentials!');
+    return res.sendStatus(401).send('Access Denied. Incorrect credentials!');
   }
 };
 

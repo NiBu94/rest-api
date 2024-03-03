@@ -28,6 +28,9 @@ app.use((req, res, next) => {
   next();
 });
 app.use(morgan);
+app.get(`/${config.api}/health-check`, (req, res) => {
+  res.sendStatus(200).end();
+});
 
 app.use(`/${config.api}/payment`, paymentRouter);
 if (config.env !== 'local') {
