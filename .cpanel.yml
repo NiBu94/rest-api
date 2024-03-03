@@ -1,4 +1,4 @@
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/vanderm1/neu.vandermerwe.ch/api
+    - export DEPLOYPATH=/home/vanderm1/vandermerwe.ch/api
     - /bin/cp -R * $DEPLOYPATH/
