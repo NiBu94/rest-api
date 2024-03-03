@@ -25,7 +25,7 @@ export default {
     pass: process.env.SMTP_PASS,
   },
   debug: {
-    user: process.env.USER,
-    pass: process.env.PASS,
+    user: process.env.ADMIN_USER,
+    pass: process.env.ADMIN_PASS,
   },
 };
