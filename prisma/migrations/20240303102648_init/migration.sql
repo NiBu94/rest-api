@@ -1,4 +1,15 @@
 -- CreateTable
+CREATE TABLE `User` (
+    `id` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `username` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `User_username_key`(`username`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Customer` (
     `id` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -38,6 +49,7 @@ CREATE TABLE `Booking` (
     `customerId` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Booking_customerId_key`(`customerId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -81,7 +93,6 @@ CREATE TABLE `Payment` (
     `bookingId` VARCHAR(191) NOT NULL,
     `price` DOUBLE NOT NULL,
     `currency` VARCHAR(191) NOT NULL DEFAULT 'CHF',
-    `orderId` VARCHAR(191) NOT NULL,
     `transactionStatus` ENUM('AUTHORIZED', 'CAPTURED', 'CANCELED') NULL,
     `transactionType` VARCHAR(191) NULL,
     `transactionId` VARCHAR(191) NULL,
@@ -96,7 +107,6 @@ CREATE TABLE `Payment` (
     `captureDate` DATETIME(3) NULL,
 
     UNIQUE INDEX `Payment_bookingId_key`(`bookingId`),
-    UNIQUE INDEX `Payment_orderId_key`(`orderId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
