@@ -15,7 +15,7 @@ const validatePayload = [
   body('firstChild.birthday').isISO8601().withMessage('birthday must be a valid ISO8601 date'),
   body('firstChild.gender').isString().withMessage('gender must be a string').escape(),
   body('firstChild.allowanceToGoHomeAlone').isBoolean().withMessage('allowanceToGoHomeAlone must be a boolean'),
-  body('firstChild.allergies').isString().withMessage('allergies must be a string').escape(),
+  body('firstChild.allergies').optional().isString().withMessage('allergies must be a string').escape(),
 
   body('secondChild').custom((value) => {
     if (Object.keys(value).length === 0) return true; // Allow empty object for secondChild
@@ -39,7 +39,7 @@ const validatePayload = [
   body('customer.city').isString().withMessage('city must be a string').escape(),
   body('customer.email').isEmail().withMessage('Invalid email format').normalizeEmail(),
   body('customer.firstPhoneNumber').isString().withMessage('firstPhoneNumber must be a string').escape(),
-  body('customer.secondPhoneNumber').isString().withMessage('secondPhoneNumber must be a string').escape(),
+  body('customer.secondPhoneNumber').optional().isString().withMessage('secondPhoneNumber must be a string').escape(),
   body('customer.optionalMessage').optional().isString().withMessage('optionalMessage must be a string').escape(),
   body('customer.agreementAGB').isBoolean().withMessage('agreementAGB must be a boolean'),
 
