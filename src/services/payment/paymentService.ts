@@ -33,7 +33,7 @@ const createPayment = async (requestId, price, customToken, bookingId, customerE
       Description: 'Bezahlung für Kindercamps',
     },
     ReturnUrl: {
-      Url: `https://fitnessallschwil.ch/wp/bezahlung-verarbeitet?customToken=${customToken}`,
+      Url: `https://fitnessallschwil.ch/wpt/bezahlung-verarbeitet?customToken=${customToken}`,
     },
 
     Notification: {
