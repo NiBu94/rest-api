@@ -29,10 +29,10 @@ if (config.env !== 'local') {
 
     if (!logger.isDebugEnabled()) {
       logger.add(debugTransport);
-      res.sendStatus(200).send('Debug enabled');
+      res.status(200).send('Debug enabled');
     } else {
       logger.remove(logger.transports[2]);
-      res.sendStatus(200).send('Debug disabled');
+      res.status(200).send('Debug disabled');
     }
   };
 

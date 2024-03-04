@@ -25,13 +25,13 @@ const createPayment = async (req, res) => {
     if (config.env === 'local') logger.info(JSON.stringify(response.data.RedirectUrl));
     const payment = await db.payment.create(booking.id, price);
     await db.tokens.create(payment.id, customToken, response.data.Token, response.data.Expiration);
-    res.sendStatus(201).json({ redirectURL: response.data.RedirectUrl });
+    res.status(201).json({ redirectURL: response.data.RedirectUrl });
   } catch (err) {
     logger.error(err);
     if (err instanceof AxiosError) {
       logger.error(JSON.stringify(err.response.data));
     }
-    res.sendStatus(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -55,10 +55,10 @@ const finalizePayment = async (req, res) => {
         await emailService.sendPaymentSuccessToCustomer(customer, children, weeks, payment.price);
         await emailService.sendPaymentSuccessToOwner(customer, children, weeks, payment.price);
       case 'CAPTURED':
-        res.sendStatus(200).json({ message: 'Danke für Ihre Bezahlung. Sie erhalten in kürze zwei Bestätigungs-E-Mails.' });
+        res.status(200).json({ message: 'Danke für Ihre Bezahlung. Sie erhalten in kürze zwei Bestätigungs-E-Mails.' });
         break;
       case 'CANCELED':
-        res.sendStatus(200).json({ message: 'Die Zahlung wurde durch Sie abgebrochen.' });
+        res.status(200).json({ message: 'Die Zahlung wurde durch Sie abgebrochen.' });
         break;
     }
   } catch (err) {
@@ -70,13 +70,13 @@ const finalizePayment = async (req, res) => {
         } catch (err) {
           logger.error(`Failed updating canceled payment: ${req.query.customToken}`, err);
         }
-        res.sendStatus(200).json({ message: 'Die Zahlung wurde durch Sie abgebrochen.' });
+        res.status(200).json({ message: 'Die Zahlung wurde durch Sie abgebrochen.' });
       } else {
         logger.error(JSON.stringify(err.response.data));
       }
     } else {
       logger.error(err);
-      res.sendStatus(500).json({ message: 'Internal server error' });
+      res.status(500).json({ message: 'Internal server error' });
     }
   }
 };
@@ -85,10 +85,10 @@ const paymentFailed = async (req, res) => {
   try {
     const paymentId = await db.tokens.getPaymentId(req.query.customToken);
     await db.payment.updateOnFailure(paymentId, 'CANCELED');
-    res.sendStatus(200).end();
+    res.status(200).end();
   } catch (err) {
     logger.error(`Failed updating canceled payment: ${req.query.customToken}`);
-    res.sendStatus(200).end();
+    res.status(200).end();
   }
 };
 
