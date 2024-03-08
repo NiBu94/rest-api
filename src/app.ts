@@ -28,7 +28,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(morgan);
-app.get(`/${config.api}/health-check`, (req, res) => {
+app.get(`/${config.api}/health-check`, basicAuth, (req, res) => {
   res.status(200).end();
 });
 
