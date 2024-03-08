@@ -8,6 +8,6 @@ router.post('/', validator, paymentHandler.createPayment);
 
 router.get('/', paymentHandler.finalizePayment);
 
-router.get('/failed', paymentHandler.finalizePayment);
+router.get('/failed', paymentHandler.paymentFailed);
 
 export default router;
