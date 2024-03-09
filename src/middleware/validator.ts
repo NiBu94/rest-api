@@ -34,7 +34,7 @@ const validatePayload = [
   body('customer.street').isString().withMessage('street must be a string').escape(),
   body('customer.streetNumber').isString().withMessage('streetNumber must be a string').escape(),
   body('customer.zipCode')
-    .matches(/^[0-9]{5}$/)
+  .matches(/^[0-9]{4,5}$/)
     .withMessage('zipCode must be 5 digits'),
   body('customer.city').isString().withMessage('city must be a string').escape(),
   body('customer.email').isEmail().withMessage('Invalid email format').normalizeEmail(),
