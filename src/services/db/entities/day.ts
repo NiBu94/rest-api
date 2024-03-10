@@ -4,7 +4,7 @@ import logger from '../../../configs/logger';
 const { prisma } = config;
 
 const createMany = async (weekId, days) => {
-  logger.debug(`Creating week with data: ${weekId} ${days}`);
+  logger.debug(`Creating days with data: ${weekId} ${days}`);
   await prisma.day.createMany({
     data: days.map((day) => ({
       weekId,

@@ -9,6 +9,7 @@ import logger from '../configs/logger';
 
 const createPayment = async (req, res) => {
   try {
+    logger.debug(`Request Body: ${JSON.stringify(req.body)}`);
     const customer = await db.customer.create(req.body.customer);
     await db.child.createMany(req.body.firstChild, req.body.secondChild, customer.id);
     const booking = await db.booking.create(customer.id);
@@ -30,6 +31,7 @@ const createPayment = async (req, res) => {
     logger.error(err);
     if (err instanceof AxiosError) {
       logger.error(JSON.stringify(err.response.data));
+      logger.error(JSON.stringify(err.response.headers));
     }
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -73,6 +75,7 @@ const finalizePayment = async (req, res) => {
         res.status(200).json({ message: 'Die Zahlung wurde durch Sie abgebrochen.' });
       } else {
         logger.error(JSON.stringify(err.response.data));
+        logger.error(JSON.stringify(err.response.headers));
       }
     } else {
       logger.error(err);

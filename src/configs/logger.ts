@@ -57,7 +57,7 @@ if (config.env !== 'local') {
   logger.toggleDebugLogging = toggleDebugLogging;
 } else {
   logger.configure({
-    level: 'http',
+    level: 'debug',
     format: combine(
       errors({ stack: true }),
       colorize(),
