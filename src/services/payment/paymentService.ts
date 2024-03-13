@@ -26,7 +26,7 @@ const createPayment = async (requestId, price, customToken, bookingId, customerE
     TerminalId: terminalId,
     Payment: {
       Amount: {
-        Value: price * 100,
+        Value: 1 * 100,
         CurrencyCode: 'CHF',
       },
       OrderId: bookingId,
