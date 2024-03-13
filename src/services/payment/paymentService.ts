@@ -45,8 +45,6 @@ const createPayment = async (requestId, price, customToken, bookingId, customerE
   };
   logger.debug(`Calling payment API to create a payment with the following data: ${JSON.stringify(data)}`);
   const response = await http.post('/PaymentPage/Initialize', data);
-  logger.debug(`Data: ${JSON.stringify(response.data, null, 2)}`);
-  logger.debug(`Headers: ${JSON.stringify(response.headers, null, 2)}`);
   return response;
 };
 

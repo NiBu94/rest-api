@@ -1,4 +1,4 @@
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/vanderm1/rest-api
+    - export DEPLOYPATH=/home/vanderm1/prod/rest-api
     - /bin/cp -R * $DEPLOYPATH/
