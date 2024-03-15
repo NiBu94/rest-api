@@ -95,8 +95,48 @@ const paymentFailed = async (req, res) => {
   }
 };
 
+const retryEmails = async (req, res) => {
+  try {
+    const tokens = await db.tokens.get(req.query.customToken);
+    const payment = await db.payment.get(tokens.paymentId);
+
+    switch (payment.transactionStatus) {
+      case 'CAPTURED':
+        const customer = await db.booking.getCustomer(payment.bookingId);
+        const children = await db.child.getMany(customer.id);
+        const weeks = await db.week.getManyWithDays(payment.bookingId);
+        await emailService.sendPaymentSuccessToCustomer(customer, children, weeks, payment.price);
+        await emailService.sendPaymentSuccessToOwner(customer, children, weeks, payment.price);
+        res.status(200).json({ message: 'Danke für Ihre Bezahlung. Sie erhalten in kürze zwei Bestätigungs-E-Mails.' });
+        break;
+      case 'CANCELED':
+        res.status(200).json({ message: 'Die Zahlung wurde durch Sie abgebrochen.' });
+        break;
+    }
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      if (err.response?.data?.ErrorName === 'TRANSACTION_ABORTED') {
+        try {
+          const paymentId = await db.tokens.getPaymentId(req.query.customToken);
+          await db.payment.updateOnFailure(paymentId, 'CANCELED');
+        } catch (err) {
+          logger.error(`Failed updating canceled payment: ${req.query.customToken}`, err);
+        }
+        res.status(200).json({ message: 'Die Zahlung wurde durch Sie abgebrochen.' });
+      } else {
+        logger.error(JSON.stringify(err.response.data));
+        logger.error(JSON.stringify(err.response.headers));
+      }
+    } else {
+      logger.error(err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+};
+
 export default {
   createPayment,
   finalizePayment,
   paymentFailed,
+  retryEmails,
 };

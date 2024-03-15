@@ -10,4 +10,6 @@ router.get('/', paymentHandler.finalizePayment);
 
 router.get('/failed', paymentHandler.paymentFailed);
 
+router.get('/retry', paymentHandler.retryEmails);
+
 export default router;
