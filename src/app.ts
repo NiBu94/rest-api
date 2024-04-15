@@ -38,7 +38,7 @@ app.get(`/${config.api}/health-check`, basicAuth, (req, res) => {
 app.use(`/${config.api}/payment`, paymentRouter);
 app.use(`/${config.api}/user`, basicAuth, userRouter);
 if (config.env !== 'local') {
-  app.get('/admin/toggle-debug-logging', basicAuth, logger.toggleDebugLogging);
+  app.get(`/${config.api}/admin/toggle-debug-logging`, basicAuth, logger.toggleDebugLogging);
 }
 
 export default app;
