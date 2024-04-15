@@ -13,6 +13,14 @@ const create = async (customer) => {
   });
 };
 
+const get = async (customerId) => {
+  logger.debug(`Fetching customer with data: ${customerId}`);
+  const customer = await prisma.customer.findUnique({
+    where: { id: customerId },
+    select: { id: true, children: true },
+  });
+};
+
 export default {
   create,
 };

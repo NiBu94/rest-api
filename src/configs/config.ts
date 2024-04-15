@@ -24,8 +24,18 @@ export default {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  debug: {
+  admin: {
     user: process.env.ADMIN_USER,
     pass: process.env.ADMIN_PASS,
+  },
+  session: {
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: 'strict',
+    },
   },
 };
