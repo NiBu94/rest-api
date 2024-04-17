@@ -3,45 +3,43 @@ import logger from '../../../configs/logger';
 
 const { prisma } = config;
 
-//username is an email address
-
-const get = async (id) => {
-  logger.debug(`Fetching user with following data: ${id}`);
-  return prisma.user.findUnique({ where: { id }, select: { id: true, createdAt: true, name: true } });
+const get = async (email) => {
+  logger.debug(`Fetching user with following data: ${email}`);
+  return prisma.user.findUnique({ where: { email }, select: { id: true, password: true } });
 };
 
 const getAll = async () => {
-  return prisma.user.findMany({ select: { id: true, createdAt: true, name: true } });
+  return prisma.user.findMany({ select: { id: true, createdAt: true, email: true } });
 };
 
-const create = async (username, password) => {
-  logger.debug(`Creating user with following data: ${username} ${password}`);
-  return prisma.user.create({
+const create = async (email, password) => {
+  logger.debug(`Creating user with following data: ${email}`);
+  await prisma.user.create({
     data: {
-      name: username,
+      email,
       password,
     },
   });
 };
 
-const update = async (user, userId) => {
-  logger.debug(`Updating user with following data: ${JSON.stringify(user)}, ${userId}`);
+const update = async (email, password) => {
+  logger.debug(`Updating user with following data: ${email}`);
   return prisma.user.update({
     where: {
-      id: userId,
+      email: email,
     },
     data: {
-      name: user.name,
-      password: user.password,
+      email: email,
+      password: password,
     },
   });
 };
 
-const deleteUser = async (username) => {
-  logger.debug(`Deleting user with following data: ${username}`);
+const deleteUser = async (email) => {
+  logger.debug(`Deleting user with following data: ${email}`);
   await prisma.user.delete({
     where: {
-      name: username,
+      email,
     },
   });
 };

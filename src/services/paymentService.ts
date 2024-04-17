@@ -1,7 +1,7 @@
 //@ts-nocheck
-import http from '../../configs/axios';
-import config from '../../configs/config';
-import logger from '../../configs/logger';
+import http from '../configs/axios';
+import config from '../configs/config';
+import logger from '../configs/logger';
 
 const { terminalId, customerId, url, auth, receiverForNotification, notifyUrl } = config.saferpay;
 

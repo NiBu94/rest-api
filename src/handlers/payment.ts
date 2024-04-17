@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import db from '../services/db/dbService';
 import config from '../configs/config';
-import paymentService from '../services/payment/paymentService';
+import paymentService from '../services/paymentService';
 import emailService from '../services/email/emailService';
 import { calculatePrice } from '../modules/priceCalculator';
 import { AxiosError } from 'axios';

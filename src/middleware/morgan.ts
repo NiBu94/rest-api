@@ -32,7 +32,7 @@ if (config.env === 'local') {
     { stream: { write: (message) => logger.http(message) } }
   );
 } else {
-  morganConfig = morgan('[IN] :remote-addr - [:id] - :method :url :status :response-time ms  - :res[content-length]', {
+  morganConfig = morgan('[IN] - [:id] - :method :url :status :response-time ms  - :res[content-length]', {
     stream: { write: (message) => logger.http(message) },
   });
 }

@@ -1,7 +1,19 @@
 import { PrismaClient } from '@prisma/client';
+import session from 'express-session';
+import MySQLSession from 'express-mysql-session';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
+
+const MySQLStore = MySQLSession(session);
+const options = {
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
+};
+const sessionStore = new MySQLStore(options);
 
 const prisma = new PrismaClient();
 
@@ -29,11 +41,14 @@ export default {
     pass: process.env.ADMIN_PASS,
   },
   session: {
+    key: 'dashboardSessionId',
     secret: process.env.SESSION_SECRET,
+    store: sessionStore,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
+      secure: process.env.NODE_ENV === 'production', // Secure cookies in production
       httpOnly: true,
       sameSite: 'strict',
     },
