@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import dashboardHandler from '../handlers/dashboard';
 import { redirectIfAuthenticated, authenticated } from '../middleware/auth';
+import config from '../configs/config';
 
 const router = Router();
 
@@ -15,6 +16,6 @@ router.post('/login', dashboardHandler.login);
 
 router.get('/dashboard', authenticated, dashboardHandler.dashboardHtml);
 
-router.post('/download-excel', /*authenticated,*/ dashboardHandler.downloadExcel);
+router.post(`/${config.api}/download-excel`, authenticated, dashboardHandler.downloadExcel);
 
 export default router;

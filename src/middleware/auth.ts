@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import config from '../configs/config';
 import logger from '../configs/logger';
+import path from 'path';
 
 export const basicAuth = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -24,14 +25,14 @@ export const basicAuth = async (req: Request, res: Response, next: NextFunction)
 export const authenticated = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.session.userId) {
     logger.warn('Unauthorized access');
-    res.status(401).send('Bitte loggen Sie sich ein.');
+    res.status(401).sendFile(path.join(__dirname, '..', '..', 'public', 'not-logged-in.html'));
   }
   next();
 };
 
 export const redirectIfAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   if (req.session.userId) {
-    res.redirect('/dashboard');
+    res.redirect('/admin/dashboard');
   } else {
     next();
   }

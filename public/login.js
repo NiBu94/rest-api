@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
     //ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
     try {
-      const response = await fetch('/login', {
+      const response = await fetch('/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

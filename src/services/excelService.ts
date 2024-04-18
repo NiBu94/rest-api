@@ -1,22 +1,23 @@
+//@ts-nocheck
 import ExcelJS from 'exceljs';
 import { formatDate } from '../modules/formatDate';
 
-const getWeekDays = () => {
+const getWeekdays = () => {
   return {
-    carnivalFirstWeek: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
-    carnivalSecondWeek: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
-    easterFirstWeek: ['Mo', 'Di', 'Mi', 'Do'],
-    easterSecondWeek: ['Di', 'Mi', 'Do', 'Fr'],
-    summerFirstWeek: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
-    summerSecondWeek: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
-    summerThirdWeek: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
-    summerFourthWeek: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
-    summerFifthWeek: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
-    summerSixtWeek: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
-    autumnFirstWeek: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
-    autumnSecondWeek: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
-    christmasFirstWeek: ['Mi', 'Do', 'Fr'],
-    christmasSecondWeek: ['Di', 'Mi', 'Do', 'Fr'],
+    carnivalFirstWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Fasnachtsferien 1.' },
+    carnivalSecondWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Fasnachtsferien 2.' },
+    easterFirstWeek: { days: ['Mo', 'Di', 'Mi', 'Do'], label: 'Ostern 1.' },
+    easterSecondWeek: { days: ['Di', 'Mi', 'Do', 'Fr'], label: 'Ostern 2.' },
+    summerFirstWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 1.' },
+    summerSecondWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 2.' },
+    summerThirdWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 3.' },
+    summerFourthWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 4.' },
+    summerFifthWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 5.' },
+    summerSixtWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 6.' },
+    autumnFirstWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Herbst 1.' },
+    autumnSecondWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Herbst 2.' },
+    christmasFirstWeek: { days: ['Mi', 'Do', 'Fr'], label: 'Weihnachten 1.' },
+    christmasSecondWeek: { days: ['Di', 'Mi', 'Do', 'Fr'], label: 'Weihnachten 2.' },
   };
 };
 const defaultFont = {
@@ -25,11 +26,15 @@ const defaultFont = {
   color: { argb: 'FF000000' },
 };
 
-const createHeaders = (weekDays) => {
+const createHeaders = (weekdays) => {
   const arr = [];
   arr.push('Nachname', 'Vorname', 'm/w', 'Geburtstag', 'Allergien', 'Alleine nach Hause');
-  arr.push(weekDays);
-  arr.push('Telefon 1', 'Telefon 2', 'Email', 'Zusatzbetreuung', 'Betrag bezahlt');
+
+  for (const weekday of weekdays) {
+    arr.push(weekday);
+  }
+
+  arr.push('Telefon 1', 'Telefon 2', 'Email', 'Zusatz-betreuung', 'Betrag bezahlt');
   return arr;
 };
 
@@ -37,15 +42,21 @@ const createHeaderConfig = (headers) => {
   const headerConfig = headers.map((header) => {
     let width;
     if (['Mo', 'Di', 'Mi', 'Do', 'Fr'].includes(header)) {
-      width = 5; // Very narrow columns for single-character values
+      width = 5;
     } else if (header === 'm/w') {
-      width = 6; // Narrow column for 'm' or 'w'
+      width = 6;
     } else if (header === 'Geburtstag') {
-      width = 12; // Standard date format
+      width = 12;
     } else if (header === 'Alleine nach Hause') {
-      width = 6.5; // Slightly wider to accommodate line break in header
+      width = 6.5;
+    } else if (header === 'Zusatz-betreuung') {
+      width = 9.5;
+    } else if (header === 'Betrag bezahlt') {
+      width = 6.5;
+    } else if (header === 'Email') {
+      width = 35;
     } else {
-      width = 15; // Default width for other columns
+      width = 15;
     }
 
     return {
@@ -63,30 +74,30 @@ const createHeaderConfig = (headers) => {
 
 const createWorkbook = () => new ExcelJS.Workbook();
 
-const createDataObject = (
-  lastName,
-  firstName,
-  gender,
-  birthday,
-  allergies,
-  allowanceToGoHomeAlone,
-  weekDays,
-  telephone1,
-  telephone2,
-  additionalCare,
-  amountPaid
-) => {
+const createDataObject = (lastName, firstName, gender, birthday, allergies, allowanceToGoHomeAlone, headers, weekdays, telephone1, telephone2, email, amountPaid) => {
   const obj = {
     Nachname: lastName,
     Vorname: firstName,
-    'm/w': gender === 'männlich' ? 'm' : 'w',
+    'm/w': gender === 'Männlich' ? 'm' : 'w',
     Geburtstag: formatDate(birthday),
     Allergien: allergies ? allergies : 'keine',
-    'Alleine nach Hause': allowanceToGoHomeAlone,
+    'Alleine nach Hause': allowanceToGoHomeAlone ? 'ja' : 'nein',
   };
-  for (const weekDay of weekDays) {
-    obj[weekDay];
+
+  for (const header of headers) {
+    obj[header] = '';
   }
+
+  for (const week of weekdays) {
+    obj[week.name] = 'X';
+  }
+
+  obj['Telefon 1'] = telephone1;
+  obj['Telefon 2'] = telephone2;
+  obj.Email = email;
+  obj.Zusatzbetreuung = '';
+  obj['Betrag bezahlt'] = amountPaid.toString();
+  return obj;
 };
 
 const createWorksheet = (workbook, worksheetDescription, headers, headerConfig, data) => {
@@ -127,25 +138,21 @@ const createWorksheet = (workbook, worksheetDescription, headers, headerConfig, 
     orientation: 'landscape',
     fitToPage: true, // Fit the print area to one page
     margins: {
-      left: 0.7,
-      right: 0.7,
-      top: 0.75,
-      bottom: 0.75,
-      header: 0.3,
-      footer: 0.3,
+      left: 0.3,
+      right: 0.3,
+      top: 0.3,
+      bottom: 0.3,
+      header: 0,
+      footer: 0,
     },
   };
-
-  return worksheet;
 };
 
-const writeFile = async (workbook, res) => await workbook.xlsx.writeFile(res);
-
 export default {
-  getWeekDays,
+  getWeekdays,
   createHeaders,
   createHeaderConfig,
   createWorkbook,
+  createDataObject,
   createWorksheet,
-  writeFile,
 };

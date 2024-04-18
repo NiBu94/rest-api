@@ -9,7 +9,7 @@ import dashboardRouter from './routes/dashboard';
 import config from './configs/config';
 import morgan from './middleware/morgan';
 import { v4 as uuidv4 } from 'uuid';
-import { basicAuth, login, redirectIfAuthenticated } from './middleware/auth';
+import { basicAuth } from './middleware/auth';
 
 const app = express();
 
@@ -31,7 +31,7 @@ app.get(`/${config.api}/health-check`, basicAuth, (req, res) => {
 
 app.use(`/${config.api}/payment`, paymentRouter);
 app.use(`/${config.api}/user`, basicAuth, userRouter);
-app.use(`/${config.api}/admin`, dashboardRouter);
+app.use(`/admin`, dashboardRouter);
 
 if (config.env !== 'local') {
   app.get(`/${config.api}/admin/toggle-debug-logging`, basicAuth, logger.toggleDebugLogging);
