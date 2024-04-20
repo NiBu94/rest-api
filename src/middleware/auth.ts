@@ -2,7 +2,6 @@
 import { Request, Response, NextFunction } from 'express';
 import config from '../configs/config';
 import logger from '../configs/logger';
-import path from 'path';
 
 export const basicAuth = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -17,17 +16,18 @@ export const basicAuth = async (req: Request, res: Response, next: NextFunction)
   if (username === config.admin.user && password === config.admin.pass) {
     next();
   } else {
-    logger.warn(`Unauthorized access. username: ${username}`);
+    logger.warn(`Unauthenticated access. username: ${username}`);
     return res.status(401).send('Access Denied. Incorrect credentials!');
   }
 };
 
 export const authenticated = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.session.userId) {
-    logger.warn('Unauthorized access');
-    res.status(401).sendFile(path.join(__dirname, '..', '..', 'public', 'not-logged-in.html'));
+    logger.warn('Unauthenticated access');
+    res.status(401).redirect('/admin/unauthenticated');
+  } else {
+    next();
   }
-  next();
 };
 
 export const redirectIfAuthenticated = (req: Request, res: Response, next: NextFunction) => {

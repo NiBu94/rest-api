@@ -1,10 +1,12 @@
 //@ts-nocheck
 import { Request, Response } from 'express';
 import path from 'path';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import db from '../services/db/dbService';
 import excel from '../services/excelService';
+import cache from '../services/cache';
 import logger from '../configs/logger';
-import bcrypt from 'bcrypt';
 
 const loginHtml = (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'login.html'));
@@ -18,8 +20,16 @@ const loginJs = (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'login.js'));
 };
 
+const unauthenticated = (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, '..', '..', 'public', 'unauthenticated.html'));
+};
+
 const dashboardHtml = (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'dashboard.html'));
+};
+
+const dashboardJs = (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, '..', '..', 'public', 'dashboard.js'));
 };
 
 export const login = async (req: Request, res: Response) => {
@@ -38,7 +48,7 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-const downloadExcel = async (req: Request, res: Response) => {
+const createDownloadLink = async (req: Request, res: Response) => {
   try {
     const weeks = await db.week.getMany(req.body.weeks);
     const weekdays = excel.getWeekdays();
@@ -101,23 +111,45 @@ const downloadExcel = async (req: Request, res: Response) => {
       excel.createWorksheet(workbook, weekdays[reqWeek].label, headers, headerConfig, data);
     }
 
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename="Report.xlsx"');
-
-    await workbook.xlsx.write(res);
-    res.end();
-    // res.status(200).json(weeks);
+    const token = crypto.randomBytes(36).toString('hex');
+    cache.set(token, workbook);
+    res.status(200).json({ downloadURL: `/admin/download-excel/${token}` });
   } catch (err) {
     logger.error(err);
     return res.sendStatus(500);
   }
 };
 
+const downloadExcel = async (req: Request, res: Response) => {
+  const workbook = cache.get(req.params.token);
+
+  if (!workbook) {
+    res.status(500).send('Zeit abgelaufen');
+    return;
+  }
+
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename="Report.xlsx"');
+
+  try {
+    await workbook.xlsx.write(res);
+  } catch (err) {
+    logger.error(err);
+    res.status(500).send('Es ist ein Fehler aufgetreten. Bitte kontaktieren Sie Ihren Administrator');
+    return;
+  }
+
+  res.end();
+};
+
 export default {
   loginHtml,
   styles,
   loginJs,
+  unauthenticated,
   dashboardHtml,
+  dashboardJs,
   login,
+  createDownloadLink,
   downloadExcel,
 };

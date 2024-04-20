@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
       email: document.getElementById('email').value,
       password: document.getElementById('password').value,
     };
-    //ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
     try {
       const response = await fetch('/admin/login', {
         method: 'POST',
