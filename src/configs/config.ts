@@ -48,7 +48,7 @@ export default {
     saveUninitialized: false,
     cookie: {
       maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
-      secure: process.env.NODE_ENV === 'production', // Secure cookies in production
+      secure: process.env.NODE_ENV === 'Production', // Secure cookies in production
       httpOnly: true,
       sameSite: 'strict',
     },
