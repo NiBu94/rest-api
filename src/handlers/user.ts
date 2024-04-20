@@ -26,7 +26,7 @@ const getAll = async (req: Request, res: Response) => {
 const create = async (req: Request, res: Response) => {
   try {
     const hash = await bcrypt.hash(req.body.password, 10);
-    await db.user.create(req.body.username, hash);
+    await db.user.create(req.body.email, hash);
     res.sendStatus(201);
   } catch (err) {
     logger.error(err);
