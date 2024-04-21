@@ -24,6 +24,7 @@ app.use((req, res, next) => {
 });
 app.use(morgan);
 app.use(session(config.session));
+app.set('trust proxy', 1);
 
 app.get(`/${config.api}/health-check`, basicAuth, (req, res) => {
   res.status(200).end();
