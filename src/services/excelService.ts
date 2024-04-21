@@ -13,7 +13,7 @@ const getWeekdays = () => {
     summerThirdWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 3.' },
     summerFourthWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 4.' },
     summerFifthWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 5.' },
-    summerSixtWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 6.' },
+    summerSixthWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Sommer 6.' },
     autumnFirstWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Herbst 1.' },
     autumnSecondWeek: { days: ['Mo', 'Di', 'Mi', 'Do', 'Fr'], label: 'Herbst 2.' },
     christmasFirstWeek: { days: ['Mi', 'Do', 'Fr'], label: 'Weihnachten 1.' },
