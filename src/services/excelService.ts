@@ -54,7 +54,7 @@ const createHeaderConfig = (headers) => {
     } else if (header === 'Betrag bezahlt') {
       width = 6.5;
     } else if (header === 'Email') {
-      width = 35;
+      width = 20;
     } else {
       width = 15;
     }
@@ -105,10 +105,11 @@ const createWorksheet = (workbook, worksheetDescription, headers, headerConfig, 
 
   worksheet.columns = headerConfig;
 
-  data.forEach((row) => {
+  for (const row of data) {
     const newRow = worksheet.addRow(row);
     newRow.font = defaultFont;
-  });
+    newRow.height = 60;
+  }
 
   // Apply borders to all cells
   worksheet.eachRow({ includeEmpty: true }, function (row) {
@@ -140,12 +141,14 @@ const createWorksheet = (workbook, worksheetDescription, headers, headerConfig, 
     margins: {
       left: 0.3,
       right: 0.3,
-      top: 0.3,
+      top: 1,
       bottom: 0.3,
-      header: 0,
+      header: 0.5,
       footer: 0,
     },
   };
+
+  worksheet.headerFooter.oddHeader = `&B${worksheetDescription} Woche`;
 };
 
 export default {
