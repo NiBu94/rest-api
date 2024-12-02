@@ -3,13 +3,14 @@ import logger from '../../../configs/logger';
 
 const { prisma } = config;
 
-const create = async (bookingId, name, maxDays) => {
-  logger.debug(`Creating week with data: ${bookingId} ${name} ${maxDays}`);
+const create = async (bookingId, name, maxDays, year) => {
+  logger.debug(`Creating week with data: ${bookingId} ${name} ${maxDays} ${year}`);
   return prisma.week.create({
     data: {
       bookingId,
       name,
       maxDays,
+      year,
     },
     select: {
       id: true,

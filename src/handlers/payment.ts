@@ -16,7 +16,8 @@ const createPayment = async (req, res) => {
 
     let price = 0;
     for (const bookedWeek of req.body.bookedWeeks) {
-      const week = await db.week.create(booking.id, bookedWeek.name, bookedWeek.maxDays);
+      const year = bookedWeek.name === 'christmasSecondWeek' ? 2024 : 2025;
+      const week = await db.week.create(booking.id, bookedWeek.name, bookedWeek.maxDays, year);
       await db.day.createMany(week.id, bookedWeek.bookedDays);
       price += calculatePrice(bookedWeek, req.body.secondChild);
     }

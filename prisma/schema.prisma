@@ -64,6 +64,7 @@ model Week {
   name      String
   maxDays   Int
   days      Day[]
+  year      Int
   booking   Booking? @relation(fields: [bookingId], references: [id])
 }
 
