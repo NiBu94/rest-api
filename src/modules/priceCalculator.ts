@@ -1,24 +1,24 @@
 import logger from '../configs/logger';
 
 const fiveDaysMax = new Map([
-  [1, 75],
-  [2, 150],
-  [3, 225],
-  [4, 290],
-  [5, 290],
+  [1, 80],
+  [2, 160],
+  [3, 240],
+  [4, 315],
+  [5, 315],
 ]);
 
 const fourDaysMax = new Map([
-  [1, 75],
-  [2, 150],
-  [3, 225],
-  [4, 240],
+  [1, 80],
+  [2, 160],
+  [3, 240],
+  [4, 255],
 ]);
 
 const threeDaysMax = new Map([
-  [1, 75],
-  [2, 150],
-  [3, 180],
+  [1, 80],
+  [2, 160],
+  [3, 195],
 ]);
 
 const priceMap = new Map([
