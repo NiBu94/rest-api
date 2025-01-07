@@ -12,6 +12,10 @@ const loginHtml = (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'login.html'));
 };
 
+const loginLogo = (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, '..', '..', 'public', 'logo.png'));
+};
+
 const styles = (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'styles.css'));
 };
@@ -50,8 +54,8 @@ export const login = async (req: Request, res: Response) => {
 
 const createDownloadLink = async (req: Request, res: Response) => {
   try {
-    const weeks = await db.week.getMany(req.body.weeks);
-    const weekdays = excel.getWeekdays();
+    const weeks = await db.week.getMany(req.body.weeks, +req.body.year);
+    const weekdays = await db.weekData.get(+req.body.year);
     const workbook = excel.createWorkbook();
     for (const reqWeek of req.body.weeks) {
       const headers = excel.createHeaders(weekdays[reqWeek].days);
@@ -144,6 +148,7 @@ const downloadExcel = async (req: Request, res: Response) => {
 
 export default {
   loginHtml,
+  loginLogo,
   styles,
   loginJs,
   unauthenticated,

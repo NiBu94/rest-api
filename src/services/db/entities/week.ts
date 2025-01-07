@@ -35,10 +35,11 @@ const getManyWithDays = async (bookingId) => {
   });
 };
 
-const getMany = async (weeks) => {
-  logger.debug(`Fetching weeks with data: ${weeks}`);
+const getMany = async (weeks, year) => {
+  logger.debug(`Fetching weeks with data: ${weeks} ${year}`);
   return prisma.week.findMany({
     where: {
+      year,
       name: { in: weeks },
       booking: {
         payment: {
