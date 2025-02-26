@@ -6,6 +6,7 @@ import payment from './entities/payment';
 import tokens from './entities/tokens';
 import week from './entities/week';
 import user from './entities/user';
+import weekData from './entities/weekData';
 
 export default {
   booking,
@@ -16,4 +17,5 @@ export default {
   tokens,
   week,
   user,
+  weekData,
 };

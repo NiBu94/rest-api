@@ -6,6 +6,7 @@ import logger from './configs/logger';
 import paymentRouter from './routes/payment';
 import userRouter from './routes/user';
 import dashboardRouter from './routes/dashboard';
+import weekDataRouter from './routes/weekData';
 import config from './configs/config';
 import morgan from './middleware/morgan';
 import { v4 as uuidv4 } from 'uuid';
@@ -32,6 +33,7 @@ app.get(`/${config.api}/health-check`, basicAuth, (req, res) => {
 
 app.use(`/${config.api}/payment`, paymentRouter);
 app.use(`/${config.api}/user`, basicAuth, userRouter);
+app.use(`/${config.api}/week-data`, weekDataRouter);
 app.use(`/admin`, dashboardRouter);
 
 if (config.env !== 'local') {

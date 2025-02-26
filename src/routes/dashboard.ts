@@ -7,6 +7,8 @@ const router = Router();
 
 router.get('/login', redirectIfAuthenticated, dashboardHandler.loginHtml);
 
+router.get('/logo.png', dashboardHandler.loginLogo);
+
 router.get('/styles.css', dashboardHandler.styles);
 
 router.get('/login.js', dashboardHandler.loginJs);
