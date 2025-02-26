@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const currentYear = new Date().getFullYear();
 
   try {
-    const response = await fetch('/api-dev/week-data/years');
+    const response = await fetch('/api/week-data/years');
     if (!response.ok) throw new Error('Failed to fetch year data');
 
     const years = await response.json();
